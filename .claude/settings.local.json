@@ -5,7 +5,13 @@
       "Bash(where python)",
       "Bash(python:*)",
       "Bash(pip install:*)",
-      "Bash(\"C:\\ProgramData\\anaconda3\\python.exe\" -c \"print(''Python works'')\")"
+      "Bash(\"C:\\ProgramData\\anaconda3\\python.exe\" -c \"print(''Python works'')\")",
+      "Bash(dir:*)",
+      "Bash(timeout:*)",
+      "Bash(curl:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nfeat: 完整的股票信息系统\n\n- 实现A股市场完整数据展示（5000+只股票）\n- 支持实时时间显示和主题切换（Light/Dark）\n- 股票搜索功能和详情页面\n- 表格排序和分页功能\n- 近20个交易日价格走势图表（显示涨跌幅）\n- 支持tushare API数据集成\n- 响应式设计，支持移动端\n- 全站字体加粗优化\n\n🤖 Generated with [Claude Code](https://claude.ai/code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
     ],
     "deny": [],
     "ask": []
