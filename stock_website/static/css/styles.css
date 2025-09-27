@@ -1,0 +1,667 @@
+/* ============================================
+   基础设置和字体
+============================================ */
+:root {
+  /* Light theme colors */
+  --bg-color: #ffffff;
+  --surface-color: #f8f9fa;
+  --text-color: #212529;
+  --text-secondary: #6c757d;
+  --border-color: #e9ecef;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --primary-color: #007bff;
+  --hover-color: #0056b3;
+  --success-color: #28a745;
+  --danger-color: #dc3545;
+  --warning-color: #ffc107;
+
+  /* Stock colors */
+  --stock-up-color: #dc3545;   /* 涨：红色 */
+  --stock-down-color: #28a745; /* 跌：绿色 */
+  --stock-neutral-color: #6c757d;
+}
+
+[data-theme="dark"] {
+  /* Dark theme colors */
+  --bg-color: #121212;
+  --surface-color: #1e1e1e;
+  --text-color: #ffffff;
+  --text-secondary: #b3b3b3;
+  --border-color: #333333;
+  --shadow-color: rgba(255, 255, 255, 0.1);
+  --primary-color: #374151;     /* 更适合dark模式的深灰蓝色 */
+  --hover-color: #4b5563;       /* hover时的颜色 */
+  --success-color: #198754;
+  --danger-color: #dc3545;
+  --warning-color: #ffc107;
+
+  /* Stock colors for dark theme */
+  --stock-up-color: #ff4757;   /* 涨：更亮的红色 */
+  --stock-down-color: #2ed573; /* 跌：更亮的绿色 */
+  --stock-neutral-color: #b3b3b3;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "微软雅黑", "Microsoft YaHei", sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  line-height: 1.6;
+  font-weight: bold;
+}
+
+/* 英文字体设置 */
+.en-font {
+  font-family: "Cascadia Code", "Consolas", monospace;
+  font-weight: bold;
+}
+
+input, button, select, textarea {
+  font-family: inherit;
+  font-weight: bold;
+}
+
+/* ============================================
+   容器和布局
+============================================ */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--surface-color);
+  box-shadow: 0 2px 4px var(--shadow-color);
+  margin-bottom: 30px;
+}
+
+.main-content {
+  min-height: calc(100vh - 200px);
+}
+
+/* ============================================
+   时间显示
+============================================ */
+.time-display {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: "Cascadia Code", "Consolas", monospace;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.time-display i {
+  color: var(--primary-color);
+}
+
+/* ============================================
+   搜索框
+============================================ */
+.search-container {
+  position: relative;
+  flex: 1;
+  max-width: 600px;
+  margin: 0 40px;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-color);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: border-color 0.3s ease;
+}
+
+.search-box:focus-within {
+  border-color: var(--primary-color);
+}
+
+#search-input {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  color: var(--text-color);
+  font-size: 1rem;
+  outline: none;
+}
+
+#search-input::placeholder {
+  color: var(--text-secondary);
+}
+
+#search-btn {
+  padding: 12px 16px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#search-btn:hover {
+  background-color: var(--hover-color);
+}
+
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 4px 6px var(--shadow-color);
+  z-index: 1000;
+  max-height: 300px;
+  overflow-y: auto;
+  display: none;
+}
+
+/* ============================================
+   主题切换
+============================================ */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+}
+
+.theme-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background-color: var(--surface-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: "Cascadia Code", "Consolas", monospace;
+}
+
+.theme-btn:hover {
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+/* ============================================
+   页面标题
+============================================ */
+.page-title {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+/* ============================================
+   加载状态
+============================================ */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+}
+
+.loading i {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  color: var(--primary-color);
+}
+
+.loading span {
+  font-size: 1.2rem;
+}
+
+/* ============================================
+   表格样式
+============================================ */
+.table-container {
+  background-color: var(--surface-color);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px var(--shadow-color);
+  border: 1px solid var(--border-color);
+}
+
+.stock-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.stock-table th {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 16px 12px;
+  text-align: left;
+  font-weight: bold;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s ease;
+  position: relative;
+}
+
+.stock-table th:hover {
+  background-color: var(--hover-color);
+}
+
+.stock-table th i {
+  margin-left: 8px;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.stock-table th:hover i {
+  opacity: 1;
+}
+
+.stock-table td {
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.3s ease;
+  font-weight: bold;
+}
+
+.stock-table tbody tr:hover {
+  background-color: var(--border-color);
+}
+
+.stock-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* 股票名称链接样式 */
+.stock-name-link {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.stock-name-link:hover {
+  color: var(--hover-color);
+  text-decoration: underline;
+}
+
+/* 价格变化样式 */
+.price-up {
+  color: var(--stock-up-color);
+  font-weight: 600;
+}
+
+.price-down {
+  color: var(--stock-down-color);
+  font-weight: 600;
+}
+
+.price-neutral {
+  color: var(--stock-neutral-color);
+}
+
+/* 数字字体 */
+.number {
+  font-family: "Cascadia Code", "Consolas", monospace;
+  font-weight: bold;
+}
+
+/* ============================================
+   分页样式
+============================================ */
+.pagination-info {
+  padding: 15px 20px;
+  background-color: var(--surface-color);
+  border-bottom: 1px solid var(--border-color);
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 20px;
+  background-color: var(--surface-color);
+  border-top: 1px solid var(--border-color);
+}
+
+.pagination-controls button {
+  padding: 8px 16px;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pagination-controls button:hover:not(:disabled) {
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.pagination-controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-input {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.page-input input {
+  width: 60px;
+  padding: 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  text-align: center;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: "Cascadia Code", "Consolas", monospace;
+}
+
+/* ============================================
+   模态框
+============================================ */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background-color: var(--surface-color);
+  margin: 10% auto;
+  padding: 30px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  box-shadow: 0 10px 30px var(--shadow-color);
+  position: relative;
+  border: 1px solid var(--border-color);
+}
+
+.close {
+  position: absolute;
+  right: 20px;
+  top: 15px;
+  font-size: 28px;
+  font-weight: bold;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.close:hover {
+  color: var(--text-color);
+}
+
+/* ============================================
+   错误信息
+============================================ */
+.error-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px;
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+[data-theme="dark"] .error-message {
+  background-color: #2d1b1e;
+  color: #f8d7da;
+  border-color: #5a2730;
+}
+
+/* ============================================
+   股票详情页面样式
+============================================ */
+.back-button {
+  display: flex;
+  align-items: center;
+}
+
+.btn-back {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background-color: var(--surface-color);
+  color: var(--text-color);
+  text-decoration: none;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.btn-back:hover {
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.stock-title h1 {
+  font-size: 1.8rem;
+  color: var(--text-color);
+}
+
+.stock-info-card {
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 6px var(--shadow-color);
+}
+
+.stock-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stock-basic h2 {
+  margin-bottom: 8px;
+  color: var(--text-color);
+}
+
+.stock-basic p {
+  color: var(--text-secondary);
+  font-family: "Cascadia Code", "Consolas", monospace;
+}
+
+.stock-price {
+  text-align: right;
+}
+
+.price {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  font-family: "Cascadia Code", "Consolas", monospace;
+  margin-bottom: 8px;
+}
+
+.change {
+  font-size: 1.2rem;
+  font-weight: 600;
+  font-family: "Cascadia Code", "Consolas", monospace;
+}
+
+/* ============================================
+   图表容器
+============================================ */
+.chart-container {
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 6px var(--shadow-color);
+}
+
+.chart-container h3 {
+  margin-bottom: 20px;
+  color: var(--text-color);
+  text-align: center;
+}
+
+#price-chart {
+  max-height: 400px;
+}
+
+/* ============================================
+   响应式设计
+============================================ */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 15px;
+  }
+
+  .header {
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px 0;
+  }
+
+  .search-container {
+    margin: 0;
+    width: 100%;
+  }
+
+  .page-title {
+    font-size: 2rem;
+  }
+
+  .stock-table {
+    font-size: 0.85rem;
+  }
+
+  .stock-table th,
+  .stock-table td {
+    padding: 10px 8px;
+  }
+
+  .stock-header {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+
+  .stock-price {
+    text-align: center;
+  }
+
+  .modal-content {
+    margin: 5% auto;
+    width: 95%;
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-title {
+    font-size: 1.8rem;
+  }
+
+  .stock-table {
+    font-size: 0.8rem;
+  }
+
+  .stock-table th,
+  .stock-table td {
+    padding: 8px 6px;
+  }
+
+  .price {
+    font-size: 1.6rem;
+  }
+
+  .change {
+    font-size: 1rem;
+  }
+}
+
+/* ============================================
+   滚动条样式
+============================================ */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface-color);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* ============================================
+   动画效果
+============================================ */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
