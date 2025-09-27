@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "flomo": {
+      "command": "C:\\ProgramData\\anaconda3\\python.exe",
+      "args": [
+        "D:\\Code\\ByteAce\\TED_MCPs\\Flomo_MCP_Ted\\flomo_mcp.py"
+      ]
+    }
+  }
+}

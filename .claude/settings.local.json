@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(where python)",
+      "Bash(python:*)",
+      "Bash(pip install:*)",
+      "Bash(\"C:\\ProgramData\\anaconda3\\python.exe\" -c \"print(''Python works'')\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
