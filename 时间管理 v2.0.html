@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>任务时间记录系统</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Ubuntu', '微软雅黑', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 30px;
+        }
+
+        .main-layout {
+            display: flex;
+            gap: 20px;
+        }
+
+        .left-section {
+            flex: 1.5;
+        }
+
+        .middle-section {
+            flex: 1;
+            min-width: 240px;
+        }
+
+        .right-section {
+            flex: 1.2;
+            min-width: 280px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .file-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f0f7ff;
+            border-radius: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .file-controls input[type="file"] {
+            display: none;
+        }
+
+        .file-controls label {
+            padding: 8px 16px;
+            background: #4CAF50;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .file-controls label:hover {
+            background: #45a049;
+        }
+
+        .auto-save-status {
+            font-size: 13px;
+            color: #666;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .save-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4CAF50;
+            margin-right: 5px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .task-input-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"], textarea {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            font-family: 'Ubuntu', '微软雅黑', 'Microsoft YaHei', sans-serif;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-start {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-start:hover {
+            background: #45a049;
+        }
+
+        .btn-pause {
+            background: #FF9800;
+            color: white;
+        }
+
+        .btn-pause:hover {
+            background: #e68900;
+        }
+
+        .btn-stop {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-stop:hover {
+            background: #da190b;
+        }
+
+        .btn-export {
+            background: #2196F3;
+            color: white;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .btn-export:hover {
+            background: #0b7dda;
+        }
+
+        .btn-add-todo, .btn-add-question {
+            background: #9C27B0;
+            color: white;
+        }
+
+        .btn-add-todo:hover, .btn-add-question:hover {
+            background: #7B1FA2;
+        }
+
+        .btn-save {
+            background: #FF5722;
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .btn-save:hover {
+            background: #E64A19;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .current-task {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .current-task h2 {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .timer {
+            font-size: 28px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 8px 0;
+        }
+
+        .records {
+            margin-top: 30px;
+        }
+
+        .records h2, .section-title {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .record-item, .question-item {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .question-item {
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .question-item:hover {
+            background: #f0f0f0;
+        }
+
+        .question-item.answered {
+            border-left: 4px solid #4CAF50;
+        }
+
+        .record-task, .question-text {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .record-time {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .no-records {
+            text-align: center;
+            color: #999;
+            padding: 20px;
+        }
+
+        .todo-section, .question-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            height: fit-content;
+        }
+
+        .section-title {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .todo-input-section, .question-input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .todo-input-section input, .question-input-section input {
+            width: 100%;
+        }
+
+        .todo-input-section button, .question-input-section button {
+            width: 100%;
+        }
+
+        .todo-item {
+            background: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s;
+        }
+
+        .todo-item.completed {
+            opacity: 0.6;
+            text-decoration: line-through;
+        }
+
+        .todo-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .todo-text {
+            flex: 1;
+            color: #333;
+            font-size: 15px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            animation: slideDown 0.3s;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #333;
+            font-size: 22px;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .modal-body label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn-modal-save {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-modal-cancel {
+            background: #999;
+            color: white;
+        }
+
+        .question-status {
+            font-size: 12px;
+            color: #4CAF50;
+            font-weight: normal;
+        }
+
+        @media (max-width: 1024px) {
+            .main-layout {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⏱️ 任务时间记录系统</h1>
+        
+        <div class="file-controls">
+            <label for="fileInput">📂 加载数据文件</label>
+            <input type="file" id="fileInput" accept=".json" onchange="loadFromFile(event)">
+            <button class="btn-save" onclick="saveToFile()">💾 手动保存</button>
+            <div class="auto-save-status">
+                <span class="save-indicator"></span>
+                <span id="saveStatus">自动保存已启用（每20分钟）</span>
+            </div>
+        </div>
+        
+        <div class="main-layout">
+            <div class="left-section">
+                <div class="task-input-section">
+                    <input type="text" id="taskInput" placeholder="输入任务名称...">
+                    <button class="btn-start" id="startBtn" onclick="startTask()">启动</button>
+                    <button class="btn-pause" id="pauseBtn" onclick="pauseTask()" disabled>暂停</button>
+                    <button class="btn-stop" id="stopBtn" onclick="stopTask()" disabled>停止</button>
+                </div>
+
+                <div class="current-task" id="currentTaskSection" style="display: none;">
+                    <h2>当前任务</h2>
+                    <div id="currentTaskName"></div>
+                    <div class="timer" id="timer">00:00:00</div>
+                </div>
+
+                <div class="records">
+                    <h2>今日记录</h2>
+                    <div id="recordsList">
+                        <div class="no-records">暂无记录</div>
+                    </div>
+                </div>
+
+                <button class="btn-export" onclick="exportToExcel()">📊 今日结束 - 导出Excel</button>
+            </div>
+
+            <div class="middle-section">
+                <div class="todo-section">
+                    <h2 class="section-title">📝 待办事项</h2>
+                    <div class="todo-input-section">
+                        <input type="text" id="todoInput" placeholder="输入待办事项...">
+                        <button class="btn-add-todo" onclick="addTodo()">添加</button>
+                    </div>
+                    <div id="todoList">
+                        <div class="no-records">暂无待办</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-section">
+                <div class="question-section">
+                    <h2 class="section-title">❓ 问题集</h2>
+                    <div class="question-input-section">
+                        <input type="text" id="questionInput" placeholder="记录问题...">
+                        <button class="btn-add-question" onclick="addQuestion()">添加</button>
+                    </div>
+                    <div id="questionList">
+                        <div class="no-records">暂无问题</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="answerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>💡 填写答案</h2>
+                <span class="close" onclick="closeAnswerModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <label>问题：</label>
+                <p id="modalQuestionText" style="margin-bottom: 15px; color: #666;"></p>
+                <label>答案：</label>
+                <textarea id="answerInput" placeholder="请输入答案..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal-cancel" onclick="closeAnswerModal()">取消</button>
+                <button class="btn-modal-save" onclick="saveAnswer()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="importModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📥 导入数据</h2>
+                <span class="close" onclick="closeImportModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 20px; color: #666;">是否清空当日任务记录？</p>
+                <p style="font-size: 14px; color: #999;">
+                    • 选择"是"：仅导入待办事项和问题集，不导入任务记录<br>
+                    • 选择"否"：导入所有数据（包括任务记录）
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal-cancel" onclick="confirmImport(true)">是，清空</button>
+                <button class="btn-modal-save" onclick="confirmImport(false)">否，全部导入</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTask = null;
+        let startTime = null;
+        let pausedTime = 0;
+        let timerInterval = null;
+        let isPaused = false;
+        let records = [];
+        let todos = [];
+        let questions = [];
+        let autoSaveInterval = null;
+        let currentQuestionId = null;
+        let pendingImportData = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            startAutoSave();
+            updateRecordsList();
+            updateTodoList();
+            updateQuestionList();
+            
+            const hasData = checkIfHasData();
+            if (!hasData) {
+                updateSaveStatus('请加载之前的数据文件，或开始新的记录');
+            }
+        });
+
+        function checkIfHasData() {
+            return records.length > 0 || todos.length > 0 || questions.length > 0 || currentTask !== null;
+        }
+
+        function startAutoSave() {
+            autoSaveInterval = setInterval(() => {
+                saveToFile(true);
+            }, 1200000);
+        }
+
+        function saveToFile(isAuto = false) {
+            const data = {
+                records: records.map(r => ({
+                    task: r.task,
+                    duration: r.duration,
+                    timestamp: r.timestamp.toISOString()
+                })),
+                todos: todos,
+                questions: questions,
+                currentTask: currentTask,
+                startTime: startTime,
+                pausedTime: pausedTime,
+                isPaused: isPaused,
+                date: new Date().toDateString(),
+                lastSaved: new Date().toISOString()
+            };
+
+            const jsonStr = JSON.stringify(data, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            
+            const today = new Date().toLocaleDateString('zh-CN').replace(/\//g, '-');
+            a.href = url;
+            a.download = `任务记录_${today}.json`;
+            
+            if (!isAuto) {
+                a.click();
+                updateSaveStatus('✅ 手动保存成功！');
+            } else {
+                a.click();
+                updateSaveStatus('✅ 自动保存成功 - ' + new Date().toLocaleTimeString('zh-CN'));
+            }
+            
+            URL.revokeObjectURL(url);
+        }
+
+        function loadFromFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    pendingImportData = JSON.parse(e.target.result);
+                    document.getElementById('importModal').style.display = 'block';
+                } catch (error) {
+                    alert('文件格式错误，无法加载数据！');
+                    updateSaveStatus('❌ 加载失败');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        function closeImportModal() {
+            document.getElementById('importModal').style.display = 'none';
+            pendingImportData = null;
+        }
+
+        function confirmImport(clearRecords) {
+            if (!pendingImportData) return;
+
+            const data = pendingImportData;
+            
+            todos = data.todos || [];
+            questions = data.questions || [];
+            
+            if (!clearRecords) {
+                records = (data.records || []).map(r => ({
+                    task: r.task,
+                    duration: r.duration,
+                    timestamp: new Date(r.timestamp)
+                }));
+                
+                currentTask = data.currentTask;
+                startTime = data.startTime;
+                pausedTime = data.pausedTime;
+                isPaused = data.isPaused;
+
+                if (currentTask && startTime) {
+                    document.getElementById('currentTaskSection').style.display = 'block';
+                    document.getElementById('currentTaskName').textContent = currentTask;
+                    document.getElementById('taskInput').value = currentTask;
+                    document.getElementById('taskInput').disabled = true;
+                    document.getElementById('startBtn').disabled = true;
+                    document.getElementById('pauseBtn').disabled = false;
+                    document.getElementById('stopBtn').disabled = false;
+
+                    if (isPaused) {
+                        document.getElementById('pauseBtn').textContent = '继续';
+                    } else {
+                        timerInterval = setInterval(updateTimer, 1000);
+                    }
+                    updateTimer();
+                }
+            }
+
+            updateRecordsList();
+            updateTodoList();
+            updateQuestionList();
+            closeImportModal();
+            updateSaveStatus('✅ 数据导入成功！');
+        }
+
+        function updateSaveStatus(message) {
+            document.getElementById('saveStatus').textContent = message;
+        }
+
+        function addTodo() {
+            const todoInput = document.getElementById('todoInput');
+            const todoText = todoInput.value.trim();
+            
+            if (!todoText) {
+                alert('请输入待办事项！');
+                return;
+            }
+
+            todos.push({
+                id: Date.now(),
+                text: todoText,
+                completed: false
+            });
+
+            todoInput.value = '';
+            updateTodoList();
+        }
+
+        function toggleTodo(id) {
+            const todo = todos.find(t => t.id === id);
+            if (todo) {
+                todo.completed = !todo.completed;
+                if (todo.completed) {
+                    setTimeout(() => {
+                        todos = todos.filter(t => t.id !== id);
+                        updateTodoList();
+                    }, 500);
+                }
+                updateTodoList();
+            }
+        }
+
+        function updateTodoList() {
+            const todoList = document.getElementById('todoList');
+            
+            if (todos.length === 0) {
+                todoList.innerHTML = '<div class="no-records">暂无待办</div>';
+                return;
+            }
+
+            todoList.innerHTML = todos.map(todo => `
+                <div class="todo-item ${todo.completed ? 'completed' : ''}">
+                    <input type="checkbox" 
+                           class="todo-checkbox" 
+                           ${todo.completed ? 'checked' : ''} 
+                           onchange="toggleTodo(${todo.id})">
+                    <div class="todo-text">${todo.text}</div>
+                </div>
+            `).join('');
+        }
+
+        function addQuestion() {
+            const questionInput = document.getElementById('questionInput');
+            const questionText = questionInput.value.trim();
+            
+            if (!questionText) {
+                alert('请输入问题！');
+                return;
+            }
+
+            questions.push({
+                id: Date.now(),
+                question: questionText,
+                answer: '',
+                answered: false,
+                createdAt: new Date().toISOString()
+            });
+
+            questionInput.value = '';
+            updateQuestionList();
+        }
+
+        function openAnswerModal(id) {
+            const question = questions.find(q => q.id === id);
+            if (!question) return;
+
+            currentQuestionId = id;
+            document.getElementById('modalQuestionText').textContent = question.question;
+            document.getElementById('answerInput').value = question.answer || '';
+            document.getElementById('answerModal').style.display = 'block';
+        }
+
+        function closeAnswerModal() {
+            document.getElementById('answerModal').style.display = 'none';
+            currentQuestionId = null;
+        }
+
+        function saveAnswer() {
+            if (!currentQuestionId) return;
+
+            const answer = document.getElementById('answerInput').value.trim();
+            const question = questions.find(q => q.id === currentQuestionId);
+            
+            if (question) {
+                question.answer = answer;
+                question.answered = answer.length > 0;
+            }
+
+            updateQuestionList();
+            closeAnswerModal();
+        }
+
+        function updateQuestionList() {
+            const questionList = document.getElementById('questionList');
+            
+            if (questions.length === 0) {
+                questionList.innerHTML = '<div class="no-records">暂无问题</div>';
+                return;
+            }
+
+            questionList.innerHTML = questions.map(q => `
+                <div class="question-item ${q.answered ? 'answered' : ''}" onclick="openAnswerModal(${q.id})">
+                    <div style="flex: 1;">
+                        <div class="question-text">${q.question}</div>
+                        ${q.answered ? '<span class="question-status">✓ 已回答</span>' : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function startTask() {
+            const taskInput = document.getElementById('taskInput');
+            const taskName = taskInput.value.trim();
+            
+            if (!taskName) {
+                alert('请输入任务名称！');
+                return;
+            }
+
+            currentTask = taskName;
+            startTime = Date.now() - pausedTime;
+            isPaused = false;
+            
+            document.getElementById('currentTaskSection').style.display = 'block';
+            document.getElementById('currentTaskName').textContent = taskName;
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('pauseBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = false;
+            taskInput.disabled = true;
+
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function pauseTask() {
+            if (isPaused) {
+                startTime = Date.now() - pausedTime;
+                isPaused = false;
+                timerInterval = setInterval(updateTimer, 1000);
+                document.getElementById('pauseBtn').textContent = '暂停';
+            } else {
+                clearInterval(timerInterval);
+                pausedTime = Date.now() - startTime;
+                isPaused = true;
+                document.getElementById('pauseBtn').textContent = '继续';
+            }
+        }
+
+        function stopTask() {
+            clearInterval(timerInterval);
+            const endTime = Date.now();
+            const duration = pausedTime || (endTime - startTime);
+            
+            records.push({
+                task: currentTask,
+                duration: duration,
+                timestamp: new Date()
+            });
+
+            updateRecordsList();
+            resetTask();
+        }
+
+        function resetTask() {
+            currentTask = null;
+            startTime = null;
+            pausedTime = 0;
+            isPaused = false;
+            
+            document.getElementById('currentTaskSection').style.display = 'none';
+            document.getElementById('timer').textContent = '00:00:00';
+            document.getElementById('taskInput').value = '';
+            document.getElementById('taskInput').disabled = false;
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('pauseBtn').disabled = true;
+            document.getElementById('pauseBtn').textContent = '暂停';
+            document.getElementById('stopBtn').disabled = true;
+        }
+
+        function updateTimer() {
+            const elapsed = Date.now() - startTime;
+            const hours = Math.floor(elapsed / 3600000);
+            const minutes = Math.floor((elapsed % 3600000) / 60000);
+            const seconds = Math.floor((elapsed % 60000) / 1000);
+            
+            document.getElementById('timer').textContent = 
+                `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function formatDuration(ms) {
+            const hours = Math.floor(ms / 3600000);
+            const minutes = Math.floor((ms % 3600000) / 60000);
+            const seconds = Math.floor((ms % 60000) / 1000);
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function updateRecordsList() {
+            const recordsList = document.getElementById('recordsList');
+            
+            if (records.length === 0) {
+                recordsList.innerHTML = '<div class="no-records">暂无记录</div>';
+                return;
+            }
+
+            recordsList.innerHTML = records.map((record, index) => `
+                <div class="record-item">
+                    <div>
+                        <div class="record-task">${record.task}</div>
+                        <small style="color: #999;">${record.timestamp.toLocaleTimeString('zh-CN')}</small>
+                    </div>
+                    <div class="record-time">${formatDuration(record.duration)}</div>
+                </div>
+            `).join('');
+        }
+
+        function exportToExcel() {
+            if (records.length === 0) {
+                alert('今日暂无记录可导出！');
+                return;
+            }
+
+            const data = records.map((record, index) => ({
+                '序号': index + 1,
+                '任务名称': record.task,
+                '用时': formatDuration(record.duration),
+                '开始时间': record.timestamp.toLocaleString('zh-CN')
+            }));
+
+            const totalDuration = records.reduce((sum, record) => sum + record.duration, 0);
+            data.push({
+                '序号': '',
+                '任务名称': '总计',
+                '用时': formatDuration(totalDuration),
+                '开始时间': ''
+            });
+
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, '时间记录');
+
+            const today = new Date().toLocaleDateString('zh-CN').replace(/\//g, '-');
+            XLSX.writeFile(wb, `任务时间记录_${today}.xlsx`);
+        }
+
+        window.addEventListener('beforeunload', () => {
+            if (checkIfHasData()) {
+                saveToFile(true);
+            }
+        });
+
+        window.onclick = function(event) {
+            const answerModal = document.getElementById('answerModal');
+            const importModal = document.getElementById('importModal');
+            if (event.target == answerModal) {
+                closeAnswerModal();
+            }
+            if (event.target == importModal) {
+                closeImportModal();
+            }
+        }
+    </script>
+</html>
+</body>
