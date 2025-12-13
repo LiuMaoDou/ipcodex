@@ -357,6 +357,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            margin-bottom: 8px;
         }
 
         .todo-checkbox {
@@ -389,6 +390,12 @@
         .todo-item.overdue .todo-deadline {
             color: #f44336;
             font-weight: 600;
+        }
+
+        .todo-actions {
+            display: flex;
+            gap: 8px;
+            padding-left: 32px;
         }
 
         .modal {
@@ -465,8 +472,13 @@
             color: #555;
         }
 
+        .modal-body input[type="text"], 
+        .modal-body input[type="date"],
         .modal-body textarea {
             width: 100%;
+        }
+
+        .modal-body textarea {
             min-height: 150px;
         }
 
@@ -572,6 +584,25 @@
         </div>
     </div>
 
+    <div id="todoEditModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✏️ 编辑待办</h2>
+                <span class="close" onclick="closeTodoEditModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <label>待办内容：</label>
+                <input type="text" id="editTodoText" placeholder="输入待办事项...">
+                <label style="margin-top: 15px;">截止日期：</label>
+                <input type="date" id="editTodoDeadline">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal-cancel" onclick="closeTodoEditModal()">取消</button>
+                <button class="btn-modal-save" onclick="saveTodoEdit()">保存</button>
+            </div>
+        </div>
+    </div>
+
     <div id="answerModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -642,6 +673,7 @@
         let autoSaveInterval = null;
         let currentQuestionId = null;
         let currentRecordIndex = null;
+        let currentTodoId = null;
         let pendingImportData = null;
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -866,8 +898,47 @@
                             ${todo.deadline ? `<div class="todo-deadline">📅 ${formatDeadline(todo.deadline)}</div>` : ''}
                         </div>
                     </div>
+                    <div class="todo-actions">
+                        <button class="btn-start btn-small" onclick="openTodoEditModal(${todo.id})">编辑</button>
+                    </div>
                 </div>
             `).join('');
+        }
+
+        function openTodoEditModal(id) {
+            const todo = todos.find(t => t.id === id);
+            if (!todo) return;
+
+            currentTodoId = id;
+            document.getElementById('editTodoText').value = todo.text;
+            document.getElementById('editTodoDeadline').value = todo.deadline || '';
+            document.getElementById('todoEditModal').style.display = 'block';
+        }
+
+        function closeTodoEditModal() {
+            document.getElementById('todoEditModal').style.display = 'none';
+            currentTodoId = null;
+        }
+
+        function saveTodoEdit() {
+            if (!currentTodoId) return;
+
+            const todo = todos.find(t => t.id === currentTodoId);
+            if (!todo) return;
+
+            const newText = document.getElementById('editTodoText').value.trim();
+            const newDeadline = document.getElementById('editTodoDeadline').value;
+
+            if (!newText) {
+                alert('待办内容不能为空！');
+                return;
+            }
+
+            todo.text = newText;
+            todo.deadline = newDeadline || null;
+
+            updateTodoList();
+            closeTodoEditModal();
         }
 
         function addQuestion() {
@@ -1115,6 +1186,7 @@
             const answerModal = document.getElementById('answerModal');
             const importModal = document.getElementById('importModal');
             const descModal = document.getElementById('descModal');
+            const todoEditModal = document.getElementById('todoEditModal');
             if (event.target == answerModal) {
                 closeAnswerModal();
             }
@@ -1123,6 +1195,9 @@
             }
             if (event.target == descModal) {
                 closeDescModal();
+            }
+            if (event.target == todoEditModal) {
+                closeTodoEditModal();
             }
         }
     </script>
