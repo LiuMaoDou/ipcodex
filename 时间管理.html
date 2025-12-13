@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>任务时间记录系统 - Pro</title>
-    <!-- 引入 Ubuntu 字体 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
@@ -127,7 +126,8 @@
             background: var(--info-color);
             color: white;
             box-shadow: 0 2px 4px rgba(66, 153, 225, 0.3);
-            margin-left: auto;
+            /* margin-left: auto;  移除这个，改用flex控制 */
+            margin-left: auto; /* 保持 auto，将按钮推到右侧，时钟紧随其后 */
         }
         .file-controls .btn-finish:hover {
             background: #3182ce; 
@@ -135,10 +135,27 @@
             box-shadow: 0 4px 6px rgba(66, 153, 225, 0.4); 
         }
 
+        /* 新增：时钟样式 */
+        .clock-display {
+            font-family: 'Ubuntu', monospace;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-main);
+            background: var(--bg-gray);
+            padding: 5px 15px;
+            border-radius: var(--radius-sm);
+            margin-left: 15px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            height: 42px;
+            letter-spacing: 1px;
+        }
+
         .auto-save-status {
             font-size: 14px;
             color: var(--text-sub);
-            flex: 1;
+            /* flex: 1; 移除 flex: 1，避免过度挤占空间 */
             display: flex;
             align-items: center;
             justify-content: flex-end;
@@ -233,9 +250,10 @@
 
         .btn-small { padding: 6px 12px; font-size: 13px; }
 
-        /* 计时器区域 */
+        /* 计时器区域 - 修改后（保留垂直排列布局） */
         .task-input-section { 
             display: flex; 
+            flex-direction: column; /* 改为垂直排列，让输入框在上面 */
             gap: 12px; 
             margin-bottom: 25px; 
             /* 新增：确保背景和阴影与待办、灵感一致 */
@@ -244,7 +262,22 @@
             border-radius: var(--radius-sm);
             box-shadow: var(--shadow-sm);
         }
-        .task-input-section input { flex: 2; }
+        
+        .task-input-section input { 
+            width: 100%; /* 输入框占满整行 */
+        }
+
+        /* 新增：按钮组容器样式 */
+        .task-buttons-row {
+            display: flex;
+            gap: 10px; /* 按钮之间的间距 */
+            width: 100%;
+        }
+
+        /* 新增：让三个按钮平分宽度，整齐排列 */
+        .task-buttons-row button {
+            flex: 1;
+        }
 
         .current-task {
             background: #fff;
@@ -461,6 +494,7 @@
             .container { padding: 20px; }
             .file-controls { flex-direction: column; align-items: stretch; }
             .file-controls .btn-finish { margin-left: 0; margin-top: 10px; }
+            .clock-display { margin-left: 0; margin-top: 10px; justify-content: center; } /* 移动端适配 */
             .auto-save-status { justify-content: center; margin-top: 10px; margin-left: 0; }
         }
     </style>
@@ -474,6 +508,9 @@
             <input type="file" id="fileInput" accept=".json" onchange="loadFromFile(event)">
             <button class="btn-save" onclick="saveToFile()">💾 立即保存</button>
             <button class="btn-finish" onclick="exportToExcel()">📊 结束今日任务</button>
+            
+            <div id="sysClock" class="clock-display">00:00:00</div>
+
             <div class="auto-save-status">
                 <span class="save-indicator"></span>
                 <span id="saveStatus">自动保存已启用</span>
@@ -485,12 +522,14 @@
                 <div class="records">
                     <h2 class="section-title">📅 今日足迹</h2>
                     
-                    <!-- 调整：将开始任务区域移动到"今日足迹"卡片内部，作为"输入/操作区" -->
                     <div class="task-input-section">
                         <input type="text" id="taskInput" placeholder="准备开始什么任务？...">
-                        <button class="btn-start" id="startBtn" onclick="startTask()">开始专注</button>
-                        <button class="btn-pause" id="pauseBtn" onclick="pauseTask()" disabled>暂停</button>
-                        <button class="btn-stop" id="stopBtn" onclick="stopTask()" disabled>完成</button>
+                        
+                        <div class="task-buttons-row">
+                            <button class="btn-start" id="startBtn" onclick="startTask()">开始专注</button>
+                            <button class="btn-pause" id="pauseBtn" onclick="pauseTask()" disabled>暂停</button>
+                            <button class="btn-stop" id="stopBtn" onclick="stopTask()" disabled>完成</button>
+                        </div>
                     </div>
 
                     <div class="current-task" id="currentTaskSection" style="display: none;">
@@ -522,7 +561,6 @@
 
             <div class="right-section">
                 <div class="question-section">
-                    <!-- 修改：标题简化为"灵感洞察" -->
                     <h2 class="section-title">💡 灵感洞察</h2>
                     <div class="question-input-section">
                         <input type="text" id="questionInput" placeholder="捕捉闪念、问题或改进点...">
@@ -536,7 +574,6 @@
         </div>
     </div>
 
-    <!-- 弹窗 -->
     <div id="todoEditModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -639,11 +676,22 @@
             updateTodoList();
             updateQuestionList();
             
+            // 启动时钟
+            updateSystemTime();
+            setInterval(updateSystemTime, 1000);
+
             const hasData = checkIfHasData();
             if (!hasData) {
                 updateSaveStatus('就绪');
             }
         });
+        
+        // 新增：更新系统时钟
+        function updateSystemTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('zh-CN', { hour12: false });
+            document.getElementById('sysClock').textContent = timeStr;
+        }
 
         function checkIfHasData() {
             return records.length > 0 || todos.length > 0 || questions.length > 0 || currentTask !== null;
