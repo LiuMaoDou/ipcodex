@@ -3,88 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>任务时间记录系统</title>
+    <title>任务时间记录系统 - Pro</title>
+    <!-- 引入 Ubuntu 字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
+        :root {
+            /* 核心配色变量 */
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #48bb78;
+            --danger-color: #f56565;
+            --warning-color: #ed8936;
+            --info-color: #4299e1;
+            --text-main: #2d3748;
+            --text-sub: #718096;
+            --bg-gray: #f7fafc;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius-md: 12px;
+            --radius-sm: 8px;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            outline: none;
         }
 
         body {
-            font-family: 'Ubuntu', '微软雅黑', 'Microsoft YaHei', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Ubuntu', 'Microsoft YaHei', '微软雅黑', sans-serif;
+            background: var(--primary-gradient);
             min-height: 100vh;
-            padding: 20px;
+            padding: 40px 20px;
+            color: var(--text-main);
+            line-height: 1.5;
         }
+
+        /* 滚动条美化 */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a0aec0; }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            padding: 30px;
-        }
-
-        .main-layout {
-            display: flex;
-            gap: 20px;
-        }
-
-        .left-section {
-            flex: 1.2;
-        }
-
-        .middle-section {
-            flex: 1;
-        }
-
-        .right-section {
-            flex: 1;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            padding: 40px;
         }
 
         h1 {
-            color: #333;
+            color: var(--text-main);
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
+            font-weight: 800;
+            font-size: 2.2rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
+        .main-layout { display: flex; gap: 30px; }
+        .left-section { flex: 1.2; }
+        .middle-section { flex: 1; }
+        .right-section { flex: 1; }
+
+        /* 文件控制区 */
         .file-controls {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #f0f7ff;
-            border-radius: 8px;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
             align-items: center;
             flex-wrap: wrap;
+            box-shadow: var(--shadow-sm);
         }
 
-        .file-controls input[type="file"] {
-            display: none;
+        .file-controls input[type="file"] { display: none; }
+
+        .file-controls label, 
+        .file-controls .btn-save,
+        .file-controls .btn-finish {
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .file-controls label {
-            padding: 8px 16px;
-            background: #4CAF50;
+            background: var(--primary-color);
             color: white;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background 0.3s;
+            box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
         }
+        .file-controls label:hover { transform: translateY(-1px); box-shadow: 0 4px 6px rgba(102, 126, 234, 0.4); }
 
-        .file-controls label:hover {
-            background: #45a049;
+        .file-controls .btn-save { 
+            background: white; 
+            color: var(--text-main); 
+            border: 1px solid var(--border-color); 
+        }
+        .file-controls .btn-save:hover { background: var(--bg-gray); border-color: #cbd5e0; transform: translateY(-1px); }
+
+        .file-controls .btn-finish {
+            background: var(--info-color);
+            color: white;
+            box-shadow: 0 2px 4px rgba(66, 153, 225, 0.3);
+            margin-left: auto;
+        }
+        .file-controls .btn-finish:hover {
+            background: #3182ce; 
+            transform: translateY(-1px); 
+            box-shadow: 0 4px 6px rgba(66, 153, 225, 0.4); 
         }
 
         .auto-save-status {
-            font-size: 13px;
-            color: #666;
+            font-size: 14px;
+            color: var(--text-sub);
             flex: 1;
-            min-width: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin-left: 15px;
         }
 
         .save-indicator {
@@ -92,312 +150,271 @@
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: #4CAF50;
-            margin-right: 5px;
+            background: var(--success-color);
+            margin-right: 8px;
+            box-shadow: 0 0 0 2px rgba(72, 187, 120, 0.2);
             animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(72, 187, 120, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(72, 187, 120, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(72, 187, 120, 0); }
         }
 
-        .task-input-section {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
+        /* 统一输入框样式 */
         input[type="text"], input[type="date"], textarea {
-            flex: 1;
-            min-width: 200px;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-            font-family: 'Ubuntu', '微软雅黑', 'Microsoft YaHei', sans-serif;
-        }
-
-        input[type="date"] {
             width: 100%;
-            height: 48px;
-        }
-
-        textarea {
-            min-height: 100px;
-            resize: vertical;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            transition: all 0.2s;
+            background: #fff;
+            color: var(--text-main);
+            font-family: inherit;
         }
 
         input[type="text"]:focus, input[type="date"]:focus, textarea:focus {
-            outline: none;
-            border-color: #667eea;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
         }
 
+        /* 统一按钮样式 */
         button {
-            padding: 12px 24px;
+            padding: 10px 20px;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s;
+            border-radius: var(--radius-sm);
+            font-size: 15px;
             font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: inherit;
         }
 
-        .btn-start {
-            background: #4CAF50;
-            color: white;
+        button:active { transform: scale(0.98); }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
         }
 
-        .btn-start:hover {
-            background: #45a049;
-        }
+        .btn-start { background: var(--success-color); color: white; box-shadow: 0 2px 5px rgba(72, 187, 120, 0.3); }
+        .btn-start:hover:not(:disabled) { background: #38a169; transform: translateY(-1px); }
 
-        .btn-pause {
-            background: #FF9800;
-            color: white;
-        }
+        .btn-pause { background: var(--warning-color); color: white; box-shadow: 0 2px 5px rgba(237, 137, 54, 0.3); }
+        .btn-pause:hover:not(:disabled) { background: #dd6b20; transform: translateY(-1px); }
 
-        .btn-pause:hover {
-            background: #e68900;
-        }
+        .btn-stop { background: var(--danger-color); color: white; box-shadow: 0 2px 5px rgba(245, 101, 101, 0.3); }
+        .btn-stop:hover:not(:disabled) { background: #e53e3e; transform: translateY(-1px); }
 
-        .btn-stop {
-            background: #f44336;
-            color: white;
-        }
-
-        .btn-stop:hover {
-            background: #da190b;
-        }
-
-        .btn-export {
-            background: #2196F3;
-            color: white;
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        .btn-export:hover {
-            background: #0b7dda;
-        }
-
-        .btn-add-todo, .btn-add-question {
-            background: #9C27B0;
-            color: white;
-        }
-
-        .btn-add-todo:hover, .btn-add-question:hover {
-            background: #7B1FA2;
-        }
-
-        .btn-save {
-            background: #FF5722;
-            color: white;
-            padding: 8px 16px;
-            font-size: 14px;
-        }
-
-        .btn-save:hover {
-            background: #E64A19;
-        }
-
-        .btn-small {
+        .btn-delete {
+            background: #fff;
+            color: var(--danger-color);
+            border: 1px solid rgba(245, 101, 101, 0.2);
             padding: 6px 12px;
             font-size: 13px;
         }
+        .btn-delete:hover { background: #fff5f5; border-color: var(--danger-color); }
 
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        .btn-add-todo, .btn-add-question {
+            background: var(--secondary-color);
+            color: white;
+            box-shadow: 0 2px 5px rgba(118, 75, 162, 0.3);
         }
+        .btn-add-todo:hover, .btn-add-question:hover { background: #6b46c1; transform: translateY(-1px); }
+
+        .btn-save-modal { background: white; color: var(--text-main); border: 1px solid var(--border-color); }
+        .btn-save-modal:hover { background: var(--bg-gray); border-color: #cbd5e0; }
+
+        .btn-small { padding: 6px 12px; font-size: 13px; }
+
+        /* 计时器区域 */
+        .task-input-section { 
+            display: flex; 
+            gap: 12px; 
+            margin-bottom: 25px; 
+            /* 新增：确保背景和阴影与待办、灵感一致 */
+            background: white;
+            padding: 15px;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-sm);
+        }
+        .task-input-section input { flex: 2; }
 
         .current-task {
-            background: #f5f5f5;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+            background: #fff;
+            padding: 25px;
+            border-radius: var(--radius-md);
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            box-shadow: var(--shadow-sm);
         }
 
         .current-task h2 {
-            font-size: 16px;
-            color: #666;
-            margin-bottom: 8px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-sub);
+            margin-bottom: 10px;
+        }
+
+        #currentTaskName {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 10px;
         }
 
         .timer {
-            font-size: 28px;
-            font-weight: bold;
-            color: #667eea;
-            margin: 8px 0;
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--primary-color);
+            font-variant-numeric: tabular-nums;
+            text-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
         }
 
-        .records {
-            margin-top: 30px;
+        /* 区域容器 */
+        .records, .todo-section, .question-section { 
+            margin-bottom: 20px; 
+            background: var(--bg-gray); /* 三个区域背景色统一 */
+            padding: 25px;
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(0,0,0,0.03);
+            height: 100%;
         }
-
-        .records h2, .section-title {
+        
+        .section-title {
             font-size: 18px;
-            color: #333;
-            margin-bottom: 15px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .record-item {
-            background: #f9f9f9;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
+        /* 列表项 */
+        .record-item, .todo-item, .question-item {
+            background: white;
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 12px;
+            border: 1px solid var(--border-color);
+            transition: all 0.25s ease;
+            position: relative;
         }
 
+        .record-item:hover, .todo-item:hover, .question-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: #cbd5e0;
+        }
+
+        /* 记录详情 */
         .record-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
+            align-items: flex-start;
         }
 
-        .record-task {
-            font-weight: 600;
-            color: #333;
+        .record-task { font-weight: 700; font-size: 16px; color: var(--text-main); }
+        
+        /* 使用 Ubuntu 字体 */
+        .record-time { 
+            color: var(--primary-color); 
+            font-weight: 700; 
+            font-family: 'Ubuntu', sans-serif; 
+            font-size: 14px; 
         }
-
-        .record-time {
-            color: #667eea;
-            font-weight: bold;
-        }
-
+        
         .record-desc {
             font-size: 14px;
-            color: #666;
-            margin-top: 8px;
-            padding-top: 8px;
-            border-top: 1px solid #e0e0e0;
+            color: var(--text-sub);
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed var(--border-color);
+            background: #fafafa;
+            padding: 10px;
+            border-radius: 6px;
         }
 
-        .record-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-        }
-
-        .question-item {
-            background: #fff;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .question-item:hover {
-            background: #f0f0f0;
-        }
-
-        .question-item.answered {
-            border-left: 4px solid #4CAF50;
-        }
-
-        .question-text {
-            font-weight: normal;
-            color: #333;
-        }
-
-        .no-records {
-            text-align: center;
-            color: #999;
-            padding: 20px;
-        }
-
-        .todo-section, .question-section {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            height: fit-content;
-        }
-
-        .section-title {
-            font-size: 18px;
-            color: #333;
-            margin-bottom: 15px;
-        }
-
-        .todo-input-section, .question-input-section {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .todo-input-section input, .question-input-section input {
-            width: 100%;
-        }
-
-        .todo-input-section button, .question-input-section button {
-            width: 100%;
-        }
-
-        .todo-item {
-            background: #fff;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            transition: all 0.3s;
-        }
-
-        .todo-item.completed {
-            opacity: 0.6;
-        }
-
-        .todo-item.overdue {
-            border-left: 4px solid #f44336;
-        }
+        /* 待办事项 */
+        .todo-item { display: flex; align-items: center; justify-content: space-between; }
+        .todo-item.completed { opacity: 0.6; background: #f9f9f9; }
+        .todo-item.overdue { border-left: 4px solid var(--danger-color); }
 
         .todo-header {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 12px;
-            margin-bottom: 8px;
+            flex: 1;
+            margin-right: 15px;
         }
 
         .todo-checkbox {
             width: 20px;
             height: 20px;
+            margin-top: 3px;
             cursor: pointer;
-            accent-color: #667eea;
-            flex-shrink: 0;
+            border-radius: 4px;
+            border: 2px solid #cbd5e0;
         }
 
-        .todo-content {
-            flex: 1;
-        }
-
-        .todo-text {
-            color: #333;
-            font-size: 15px;
-        }
-
-        .todo-item.completed .todo-text {
-            text-decoration: line-through;
-        }
-
+        .todo-text { font-weight: 700; color: var(--text-main); font-size: 15px; }
+        .todo-subtitle { font-size: 13px; color: var(--text-sub); margin-top: 4px; }
+        
         .todo-deadline {
             font-size: 12px;
-            color: #999;
+            color: var(--warning-color);
             margin-top: 4px;
+            font-weight: 600;
+            background: rgba(237, 137, 54, 0.1);
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
         }
 
-        .todo-item.overdue .todo-deadline {
-            color: #f44336;
+        /* 灵感/问题 */
+        .question-item { display: flex; justify-content: space-between; align-items: center; }
+        .question-item.answered { border-left: 4px solid var(--success-color); }
+        
+        .question-content { flex: 1; margin-right: 15px; cursor: pointer; }
+        .question-text { font-weight: 500; font-size: 15px; }
+        .question-status {
+            font-size: 12px;
+            color: var(--success-color);
+            margin-top: 4px;
+            display: block;
             font-weight: 600;
         }
 
-        .todo-actions {
-            display: flex;
-            gap: 8px;
-            padding-left: 32px;
+        .no-records {
+            text-align: center;
+            color: var(--text-sub);
+            padding: 30px;
+            font-style: italic;
+            background: rgba(0,0,0,0.02);
+            border-radius: var(--radius-sm);
         }
 
+        .todo-input-section, .question-input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+            background: white;
+            padding: 15px;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* 模态框 */
         .modal {
             display: none;
             position: fixed;
@@ -406,113 +423,45 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.5);
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
             animation: fadeIn 0.3s;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
         .modal-content {
             background-color: white;
             margin: 5% auto;
-            padding: 30px;
-            border-radius: 15px;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border: none;
+            padding: 35px;
             width: 90%;
             max-width: 600px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            position: relative;
             animation: slideDown 0.3s;
         }
 
-        @keyframes slideDown {
-            from {
-                transform: translateY(-50px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .modal-header h2 { font-size: 20px; font-weight: 700; margin: 0; color: var(--text-main); }
+        
+        .close { color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; transition: color 0.2s; }
+        .close:hover { color: var(--text-main); }
 
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
+        .modal-body { margin-bottom: 25px; }
+        .modal-body label { display: block; color: var(--text-main); font-size: 14px; font-weight: 600; margin-bottom: 8px; margin-top: 15px; }
+        .modal-body label:first-child { margin-top: 0; }
 
-        .modal-header h2 {
-            color: #333;
-            font-size: 22px;
-        }
-
-        .close {
-            color: #aaa;
-            font-size: 32px;
-            font-weight: bold;
-            cursor: pointer;
-            line-height: 1;
-        }
-
-        .close:hover {
-            color: #000;
-        }
-
-        .modal-body {
-            margin-bottom: 20px;
-        }
-
-        .modal-body label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #555;
-        }
-
-        .modal-body input[type="text"], 
-        .modal-body input[type="date"],
-        .modal-body textarea {
-            width: 100%;
-        }
-
-        .modal-body textarea {
-            min-height: 150px;
-        }
-
-        .modal-body p {
-            margin-bottom: 15px;
-            color: #666;
-        }
-
-        .modal-footer {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-        }
-
-        .btn-modal-save {
-            background: #4CAF50;
-            color: white;
-        }
-
-        .btn-modal-cancel {
-            background: #999;
-            color: white;
-        }
-
-        .question-status {
-            font-size: 12px;
-            color: #4CAF50;
-            font-weight: normal;
-        }
+        .modal-footer { display: flex; justify-content: flex-end; gap: 10px; }
 
         @media (max-width: 1024px) {
-            .main-layout {
-                flex-direction: column;
-            }
+            .main-layout { flex-direction: column; }
+            .container { padding: 20px; }
+            .file-controls { flex-direction: column; align-items: stretch; }
+            .file-controls .btn-finish { margin-left: 0; margin-top: 10px; }
+            .auto-save-status { justify-content: center; margin-top: 10px; margin-left: 0; }
         }
     </style>
 </head>
@@ -521,47 +470,49 @@
         <h1>⏱️ 任务时间记录系统</h1>
         
         <div class="file-controls">
-            <label for="fileInput">📂 加载数据文件</label>
+            <label for="fileInput">📂 加载数据</label>
             <input type="file" id="fileInput" accept=".json" onchange="loadFromFile(event)">
-            <button class="btn-save" onclick="saveToFile()">💾 手动保存</button>
+            <button class="btn-save" onclick="saveToFile()">💾 立即保存</button>
+            <button class="btn-finish" onclick="exportToExcel()">📊 结束今日任务</button>
             <div class="auto-save-status">
                 <span class="save-indicator"></span>
-                <span id="saveStatus">自动保存已启用（每20分钟）</span>
+                <span id="saveStatus">自动保存已启用</span>
             </div>
         </div>
         
         <div class="main-layout">
             <div class="left-section">
-                <div class="task-input-section">
-                    <input type="text" id="taskInput" placeholder="输入任务名称...">
-                    <button class="btn-start" id="startBtn" onclick="startTask()">启动</button>
-                    <button class="btn-pause" id="pauseBtn" onclick="pauseTask()" disabled>暂停</button>
-                    <button class="btn-stop" id="stopBtn" onclick="stopTask()" disabled>停止</button>
-                </div>
-
-                <div class="current-task" id="currentTaskSection" style="display: none;">
-                    <h2>当前任务</h2>
-                    <div id="currentTaskName"></div>
-                    <div class="timer" id="timer">00:00:00</div>
-                </div>
-
                 <div class="records">
-                    <h2>今日记录</h2>
+                    <h2 class="section-title">📅 今日足迹</h2>
+                    
+                    <!-- 调整：将开始任务区域移动到"今日足迹"卡片内部，作为"输入/操作区" -->
+                    <div class="task-input-section">
+                        <input type="text" id="taskInput" placeholder="准备开始什么任务？...">
+                        <button class="btn-start" id="startBtn" onclick="startTask()">开始专注</button>
+                        <button class="btn-pause" id="pauseBtn" onclick="pauseTask()" disabled>暂停</button>
+                        <button class="btn-stop" id="stopBtn" onclick="stopTask()" disabled>完成</button>
+                    </div>
+
+                    <div class="current-task" id="currentTaskSection" style="display: none;">
+                        <h2>正在进行</h2>
+                        <div id="currentTaskName"></div>
+                        <div class="timer" id="timer">00:00:00</div>
+                    </div>
+
                     <div id="recordsList">
-                        <div class="no-records">暂无记录</div>
+                        <div class="no-records">今天还没有开始记录，加油！</div>
                     </div>
                 </div>
-
-                <button class="btn-export" onclick="exportToExcel()">📊 今日结束 - 导出Excel</button>
             </div>
 
             <div class="middle-section">
                 <div class="todo-section">
-                    <h2 class="section-title">📝 待办事项</h2>
+                    <h2 class="section-title">📝 待办清单</h2>
                     <div class="todo-input-section">
                         <input type="text" id="todoInput" placeholder="输入待办事项...">
+                        <input type="text" id="todoSubtitleInput" placeholder="补充描述（可选，如步骤、备注）...">
                         <input type="date" id="todoDeadline">
-                        <button class="btn-add-todo" onclick="addTodo()">添加</button>
+                        <button class="btn-add-todo" onclick="addTodo()">添加任务</button>
                     </div>
                     <div id="todoList">
                         <div class="no-records">暂无待办</div>
@@ -571,19 +522,21 @@
 
             <div class="right-section">
                 <div class="question-section">
-                    <h2 class="section-title">❓ 问题集</h2>
+                    <!-- 修改：标题简化为"灵感洞察" -->
+                    <h2 class="section-title">💡 灵感洞察</h2>
                     <div class="question-input-section">
-                        <input type="text" id="questionInput" placeholder="记录问题...">
-                        <button class="btn-add-question" onclick="addQuestion()">添加</button>
+                        <input type="text" id="questionInput" placeholder="捕捉闪念、问题或改进点...">
+                        <button class="btn-add-question" onclick="addQuestion()">记录想法</button>
                     </div>
                     <div id="questionList">
-                        <div class="no-records">暂无问题</div>
+                        <div class="no-records">静候灵感降临...</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- 弹窗 -->
     <div id="todoEditModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -593,12 +546,16 @@
             <div class="modal-body">
                 <label>待办内容：</label>
                 <input type="text" id="editTodoText" placeholder="输入待办事项...">
-                <label style="margin-top: 15px;">截止日期：</label>
+                
+                <label>补充描述：</label>
+                <input type="text" id="editTodoSubtitle" placeholder="补充任务描述（副标题）...">
+
+                <label>截止日期：</label>
                 <input type="date" id="editTodoDeadline">
             </div>
             <div class="modal-footer">
-                <button class="btn-modal-cancel" onclick="closeTodoEditModal()">取消</button>
-                <button class="btn-modal-save" onclick="saveTodoEdit()">保存</button>
+                <button class="btn-save-modal" onclick="closeTodoEditModal()">取消</button>
+                <button class="btn-start" onclick="saveTodoEdit()">保存修改</button>
             </div>
         </div>
     </div>
@@ -606,18 +563,18 @@
     <div id="answerModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>💡 填写答案</h2>
+                <h2>💡 深度思考</h2>
                 <span class="close" onclick="closeAnswerModal()">&times;</span>
             </div>
             <div class="modal-body">
-                <label>问题：</label>
-                <p id="modalQuestionText" style="margin-bottom: 15px; color: #666;"></p>
-                <label>答案：</label>
-                <textarea id="answerInput" placeholder="请输入答案..."></textarea>
+                <label>原始内容：</label>
+                <p id="modalQuestionText" style="margin-bottom: 20px; color: var(--text-main); font-weight: 500; font-size: 16px; padding: 10px; background: var(--bg-gray); border-radius: 8px;"></p>
+                <label>洞察/解决方案：</label>
+                <textarea id="answerInput" placeholder="在这里深化您的思考，记录解决方案或后续行动..."></textarea>
             </div>
             <div class="modal-footer">
-                <button class="btn-modal-cancel" onclick="closeAnswerModal()">取消</button>
-                <button class="btn-modal-save" onclick="saveAnswer()">保存</button>
+                <button class="btn-save-modal" onclick="closeAnswerModal()">取消</button>
+                <button class="btn-start" onclick="saveAnswer()">保存记录</button>
             </div>
         </div>
     </div>
@@ -625,18 +582,18 @@
     <div id="descModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>📝 补充描述</h2>
+                <h2>📝 任务复盘</h2>
                 <span class="close" onclick="closeDescModal()">&times;</span>
             </div>
             <div class="modal-body">
-                <label>任务：</label>
-                <p id="modalRecordTask" style="margin-bottom: 15px; color: #666;"></p>
-                <label>描述：</label>
-                <textarea id="descInput" placeholder="请输入任务描述..."></textarea>
+                <label>任务名称：</label>
+                <p id="modalRecordTask" style="margin-bottom: 20px; font-weight: 600; font-size: 16px;"></p>
+                <label>补充描述/复盘：</label>
+                <textarea id="descInput" placeholder="记录这个任务的完成情况、遇到的问题或成果..."></textarea>
             </div>
             <div class="modal-footer">
-                <button class="btn-modal-cancel" onclick="closeDescModal()">取消</button>
-                <button class="btn-modal-save" onclick="saveDescription()">保存</button>
+                <button class="btn-save-modal" onclick="closeDescModal()">取消</button>
+                <button class="btn-start" onclick="saveDescription()">保存</button>
             </div>
         </div>
     </div>
@@ -644,19 +601,19 @@
     <div id="importModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>📥 导入数据</h2>
+                <h2>📥 导入数据确认</h2>
                 <span class="close" onclick="closeImportModal()">&times;</span>
             </div>
             <div class="modal-body">
-                <p style="margin-bottom: 20px; color: #666;">是否清空当日任务记录？</p>
-                <p style="font-size: 14px; color: #999;">
-                    • 选择"是"：仅导入待办事项和问题集，不导入任务记录<br>
-                    • 选择"否"：导入所有数据（包括任务记录）
-                </p>
+                <p style="margin-bottom: 20px; font-size: 16px;">您希望如何处理数据？</p>
+                <div style="background: var(--bg-gray); padding: 15px; border-radius: 8px; font-size: 14px; color: var(--text-sub);">
+                    <p style="margin-bottom: 8px;"><strong>选项 1: 清空并导入</strong><br>仅导入待办和灵感，清空今日的所有计时记录（适合新的一天）。</p>
+                    <p><strong>选项 2: 全部导入</strong><br>恢复所有数据，包括计时记录（适合恢复工作现场）。</p>
+                </div>
             </div>
             <div class="modal-footer">
-                <button class="btn-modal-cancel" onclick="confirmImport(true)">是，清空</button>
-                <button class="btn-modal-save" onclick="confirmImport(false)">否，全部导入</button>
+                <button class="btn-save-modal" onclick="confirmImport(true)">清空记录</button>
+                <button class="btn-start" onclick="confirmImport(false)">全部恢复</button>
             </div>
         </div>
     </div>
@@ -684,7 +641,7 @@
             
             const hasData = checkIfHasData();
             if (!hasData) {
-                updateSaveStatus('请加载之前的数据文件，或开始新的记录');
+                updateSaveStatus('就绪');
             }
         });
 
@@ -703,7 +660,7 @@
                 records: records.map(r => ({
                     task: r.task,
                     duration: r.duration,
-                    timestamp: r.timestamp.toISOString(),
+                    timestamp: r.timestamp instanceof Date ? r.timestamp.toISOString() : r.timestamp,
                     description: r.description || ''
                 })),
                 todos: todos,
@@ -728,10 +685,10 @@
             
             if (!isAuto) {
                 a.click();
-                updateSaveStatus('✅ 手动保存成功！');
+                updateSaveStatus('✅ 已保存');
             } else {
                 a.click();
-                updateSaveStatus('✅ 自动保存成功 - ' + new Date().toLocaleTimeString('zh-CN'));
+                updateSaveStatus('✅ 自动保存 ' + new Date().toLocaleTimeString('zh-CN', {hour: '2-digit', minute:'2-digit'}));
             }
             
             URL.revokeObjectURL(url);
@@ -763,47 +720,67 @@
         function confirmImport(clearRecords) {
             if (!pendingImportData) return;
 
-            const data = pendingImportData;
-            
-            todos = data.todos || [];
-            questions = data.questions || [];
-            
-            if (!clearRecords) {
-                records = (data.records || []).map(r => ({
-                    task: r.task,
-                    duration: r.duration,
-                    timestamp: new Date(r.timestamp),
-                    description: r.description || ''
-                }));
+            try {
+                const data = pendingImportData;
                 
-                currentTask = data.currentTask;
-                startTime = data.startTime;
-                pausedTime = data.pausedTime;
-                isPaused = data.isPaused;
+                todos = data.todos || [];
+                questions = data.questions || [];
+                
+                if (!clearRecords) {
+                    records = (data.records || []).map(r => {
+                        let timestamp;
+                        if (r.timestamp) {
+                            timestamp = new Date(r.timestamp);
+                            if (isNaN(timestamp.getTime())) {
+                                timestamp = new Date(); 
+                            }
+                        } else {
+                            timestamp = new Date(); 
+                        }
 
-                if (currentTask && startTime) {
-                    document.getElementById('currentTaskSection').style.display = 'block';
-                    document.getElementById('currentTaskName').textContent = currentTask;
-                    document.getElementById('taskInput').value = currentTask;
-                    document.getElementById('taskInput').disabled = true;
-                    document.getElementById('startBtn').disabled = true;
-                    document.getElementById('pauseBtn').disabled = false;
-                    document.getElementById('stopBtn').disabled = false;
+                        return {
+                            task: r.task || '未知任务',
+                            duration: Number(r.duration) || 0,
+                            timestamp: timestamp,
+                            description: r.description || ''
+                        };
+                    });
+                    
+                    currentTask = data.currentTask;
+                    startTime = data.startTime;
+                    pausedTime = data.pausedTime;
+                    isPaused = data.isPaused;
 
-                    if (isPaused) {
-                        document.getElementById('pauseBtn').textContent = '继续';
-                    } else {
-                        timerInterval = setInterval(updateTimer, 1000);
+                    if (currentTask && startTime) {
+                        document.getElementById('currentTaskSection').style.display = 'block';
+                        document.getElementById('currentTaskName').textContent = currentTask;
+                        document.getElementById('taskInput').value = currentTask;
+                        document.getElementById('taskInput').disabled = true;
+                        document.getElementById('startBtn').disabled = true;
+                        document.getElementById('pauseBtn').disabled = false;
+                        document.getElementById('stopBtn').disabled = false;
+
+                        if (isPaused) {
+                            document.getElementById('pauseBtn').textContent = '继续';
+                        } else {
+                            if (timerInterval) clearInterval(timerInterval);
+                            timerInterval = setInterval(updateTimer, 1000);
+                        }
+                        updateTimer();
                     }
-                    updateTimer();
+                } else {
+                    records = []; 
                 }
-            }
 
-            updateRecordsList();
-            updateTodoList();
-            updateQuestionList();
-            closeImportModal();
-            updateSaveStatus('✅ 数据导入成功！');
+                updateRecordsList();
+                updateTodoList();
+                updateQuestionList();
+                closeImportModal();
+                updateSaveStatus('✅ 数据导入成功！');
+            } catch (err) {
+                console.error("导入出错:", err);
+                alert("导入数据时发生错误，请检查文件格式。");
+            }
         }
 
         function updateSaveStatus(message) {
@@ -812,8 +789,10 @@
 
         function addTodo() {
             const todoInput = document.getElementById('todoInput');
+            const subtitleInput = document.getElementById('todoSubtitleInput');
             const deadlineInput = document.getElementById('todoDeadline');
             const todoText = todoInput.value.trim();
+            const todoSubtitle = subtitleInput.value.trim();
             
             if (!todoText) {
                 alert('请输入待办事项！');
@@ -823,12 +802,14 @@
             todos.push({
                 id: Date.now(),
                 text: todoText,
+                subtitle: todoSubtitle,
                 completed: false,
                 deadline: deadlineInput.value || null,
                 createdAt: new Date().toISOString()
             });
 
             todoInput.value = '';
+            subtitleInput.value = '';
             deadlineInput.value = '';
             updateTodoList();
         }
@@ -868,13 +849,13 @@
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             
             if (diffDays < 0) {
-                return `已逾期 ${Math.abs(diffDays)} 天`;
+                return `逾期 ${Math.abs(diffDays)} 天`;
             } else if (diffDays === 0) {
                 return '今天截止';
             } else if (diffDays === 1) {
                 return '明天截止';
             } else {
-                return `${diffDays} 天后截止`;
+                return `${diffDays} 天后`;
             }
         }
 
@@ -895,12 +876,12 @@
                                onchange="toggleTodo(${todo.id})">
                         <div class="todo-content">
                             <div class="todo-text">${todo.text}</div>
+                            ${todo.subtitle ? `<div class="todo-subtitle">${todo.subtitle}</div>` : ''}
                             ${todo.deadline ? `<div class="todo-deadline">📅 ${formatDeadline(todo.deadline)}</div>` : ''}
                         </div>
                     </div>
-                    <div class="todo-actions">
-                        <button class="btn-start btn-small" onclick="openTodoEditModal(${todo.id})">编辑</button>
-                    </div>
+                    
+                    <button class="btn-start btn-small" style="background:var(--bg-gray); color:var(--text-sub); box-shadow:none; border:1px solid var(--border-color);" onclick="openTodoEditModal(${todo.id})">编辑</button>
                 </div>
             `).join('');
         }
@@ -911,6 +892,7 @@
 
             currentTodoId = id;
             document.getElementById('editTodoText').value = todo.text;
+            document.getElementById('editTodoSubtitle').value = todo.subtitle || '';
             document.getElementById('editTodoDeadline').value = todo.deadline || '';
             document.getElementById('todoEditModal').style.display = 'block';
         }
@@ -927,6 +909,7 @@
             if (!todo) return;
 
             const newText = document.getElementById('editTodoText').value.trim();
+            const newSubtitle = document.getElementById('editTodoSubtitle').value.trim();
             const newDeadline = document.getElementById('editTodoDeadline').value;
 
             if (!newText) {
@@ -935,6 +918,7 @@
             }
 
             todo.text = newText;
+            todo.subtitle = newSubtitle;
             todo.deadline = newDeadline || null;
 
             updateTodoList();
@@ -946,7 +930,7 @@
             const questionText = questionInput.value.trim();
             
             if (!questionText) {
-                alert('请输入问题！');
+                alert('请输入内容！');
                 return;
             }
 
@@ -991,21 +975,30 @@
             updateQuestionList();
             closeAnswerModal();
         }
+        
+        function deleteQuestion(id) {
+            if (confirm('确定要删除这条记录吗？')) {
+                questions = questions.filter(q => q.id !== id);
+                updateQuestionList();
+                updateSaveStatus('✅ 记录已删除');
+            }
+        }
 
         function updateQuestionList() {
             const questionList = document.getElementById('questionList');
             
             if (questions.length === 0) {
-                questionList.innerHTML = '<div class="no-records">暂无问题</div>';
+                questionList.innerHTML = '<div class="no-records">暂无灵感与洞察</div>';
                 return;
             }
 
             questionList.innerHTML = questions.map(q => `
-                <div class="question-item ${q.answered ? 'answered' : ''}" onclick="openAnswerModal(${q.id})">
-                    <div style="flex: 1;">
+                <div class="question-item ${q.answered ? 'answered' : ''}">
+                    <div class="question-content" onclick="openAnswerModal(${q.id})">
                         <div class="question-text">${q.question}</div>
-                        ${q.answered ? '<span class="question-status">✓ 已回答</span>' : ''}
+                        ${q.answered ? '<span class="question-status">✓ 已记录洞察/解决方案</span>' : ''}
                     </div>
+                    <button class="btn-delete btn-small" onclick="deleteQuestion(${q.id})">删除</button>
                 </div>
             `).join('');
         }
@@ -1061,7 +1054,7 @@
                 startTime = Date.now() - pausedTime;
                 isPaused = false;
                 timerInterval = setInterval(updateTimer, 1000);
-                document.getElementById('pauseBtn').textContent = '暂停';
+                document.getElementById('pauseBtn').textContent = '继续';
             } else {
                 clearInterval(timerInterval);
                 pausedTime = Date.now() - startTime;
@@ -1119,29 +1112,62 @@
             return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         }
 
+        // 修改：实现倒序显示逻辑
         function updateRecordsList() {
             const recordsList = document.getElementById('recordsList');
             
             if (records.length === 0) {
-                recordsList.innerHTML = '<div class="no-records">暂无记录</div>';
+                recordsList.innerHTML = '<div class="no-records">今天还没有开始记录，加油！</div>';
                 return;
             }
 
-            recordsList.innerHTML = records.map((record, index) => `
-                <div class="record-item">
-                    <div class="record-header">
-                        <div>
-                            <div class="record-task">${record.task}</div>
-                            <small style="color: #999;">${record.timestamp.toLocaleTimeString('zh-CN')}</small>
+            // 使用 map 反向遍历，或者在 map 内部计算反向索引
+            // 为了保持性能和简单性，我们创建副本反转后显示，但注意点击事件里的索引需要修正
+            
+            // 方式：生成 HTML 时倒序生成，但保留原始索引给 onclick 使用
+            const htmlContent = records.map((record, index) => {
+                let timeString = '时间计算错误';
+                
+                try {
+                    let endTime = record.timestamp;
+                    if (!(endTime instanceof Date)) {
+                        endTime = new Date(endTime);
+                    }
+                    
+                    if (!isNaN(endTime.getTime())) {
+                        const startTimeMs = endTime.getTime() - record.duration;
+                        const startTime = new Date(startTimeMs);
+                        timeString = `${startTime.toLocaleTimeString('zh-CN', {hour: '2-digit', minute:'2-digit'})} -> ${endTime.toLocaleTimeString('zh-CN', {hour: '2-digit', minute:'2-digit'})}`;
+                    } else {
+                        timeString = "历史记录 (无详细时间)";
+                    }
+                } catch (e) {
+                    console.error("Time calculation error:", e);
+                    timeString = "时间数据异常";
+                }
+
+                return {
+                    html: `
+                        <div class="record-item">
+                            <div class="record-header">
+                                <div>
+                                    <div class="record-task">${record.task}</div>
+                                    <small style="color: var(--text-sub); font-size: 13px;">${timeString}</small>
+                                </div>
+                                <div class="record-time">${formatDuration(record.duration)}</div>
+                            </div>
+                            ${record.description ? `<div class="record-desc">${record.description}</div>` : ''}
+                            <div class="record-actions" style="margin-top: 10px;">
+                                <button class="btn-small" style="background:var(--bg-gray); color:var(--text-sub); box-shadow:none; border:1px solid var(--border-color);" onclick="openDescModal(${index})">${record.description ? '编辑复盘' : '添加复盘'}</button>
+                            </div>
                         </div>
-                        <div class="record-time">${formatDuration(record.duration)}</div>
-                    </div>
-                    ${record.description ? `<div class="record-desc">${record.description}</div>` : ''}
-                    <div class="record-actions">
-                        <button class="btn-start btn-small" onclick="openDescModal(${index})">${record.description ? '编辑描述' : '添加描述'}</button>
-                    </div>
-                </div>
-            `).join('');
+                    `,
+                    timestamp: record.timestamp // 用于排序（虽然原数组已是时间顺序，这里只是辅助）
+                };
+            });
+
+            // 倒序排列 HTML 数组并连接
+            recordsList.innerHTML = htmlContent.reverse().map(item => item.html).join('');
         }
 
         function exportToExcel() {
@@ -1150,13 +1176,27 @@
                 return;
             }
 
-            const data = records.map((record, index) => ({
-                '序号': index + 1,
-                '任务名称': record.task,
-                '用时': formatDuration(record.duration),
-                '开始时间': record.timestamp.toLocaleString('zh-CN'),
-                '描述': record.description || ''
-            }));
+            const data = records.map((record, index) => {
+                let startTimeStr = '';
+                let endTimeStr = '';
+                
+                try {
+                    let endTime = record.timestamp instanceof Date ? record.timestamp : new Date(record.timestamp);
+                    if (!isNaN(endTime.getTime())) {
+                        endTimeStr = endTime.toLocaleString('zh-CN');
+                        startTimeStr = (new Date(endTime.getTime() - record.duration)).toLocaleString('zh-CN');
+                    }
+                } catch(e) {}
+
+                return {
+                    '序号': index + 1,
+                    '任务名称': record.task,
+                    '用时': formatDuration(record.duration),
+                    '开始时间': startTimeStr,
+                    '结束时间': endTimeStr,
+                    '复盘/描述': record.description || ''
+                };
+            });
 
             const totalDuration = records.reduce((sum, record) => sum + record.duration, 0);
             data.push({
@@ -1164,7 +1204,8 @@
                 '任务名称': '总计',
                 '用时': formatDuration(totalDuration),
                 '开始时间': '',
-                '描述': ''
+                '结束时间': '',
+                '复盘/描述': ''
             });
 
             const ws = XLSX.utils.json_to_sheet(data);
@@ -1172,8 +1213,8 @@
             XLSX.utils.book_append_sheet(wb, ws, '时间记录');
 
             const now = new Date();
-            const timeStr = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}-${String(now.getSeconds()).padStart(2, '0')}`;
-            XLSX.writeFile(wb, `${timeStr}.xlsx`);
+            const timeStr = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+            XLSX.writeFile(wb, `工作报表_${timeStr}.xlsx`);
         }
 
         window.addEventListener('beforeunload', () => {
@@ -1183,21 +1224,8 @@
         });
 
         window.onclick = function(event) {
-            const answerModal = document.getElementById('answerModal');
-            const importModal = document.getElementById('importModal');
-            const descModal = document.getElementById('descModal');
-            const todoEditModal = document.getElementById('todoEditModal');
-            if (event.target == answerModal) {
-                closeAnswerModal();
-            }
-            if (event.target == importModal) {
-                closeImportModal();
-            }
-            if (event.target == descModal) {
-                closeDescModal();
-            }
-            if (event.target == todoEditModal) {
-                closeTodoEditModal();
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
             }
         }
     </script>
