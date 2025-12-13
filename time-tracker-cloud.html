@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>任务时间记录系统 - Cloud Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            /* 核心配色变量 */
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #48bb78;
+            --danger-color: #f56565;
+            --warning-color: #ed8936;
+            --info-color: #4299e1;
+            --text-main: #2d3748;
+            --text-sub: #718096;
+            --bg-gray: #f7fafc;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius-md: 12px;
+            --radius-sm: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        body {
+            font-family: 'Ubuntu', 'Microsoft YaHei', '微软雅黑', sans-serif;
+            background: var(--primary-gradient);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        /* 滚动条美化 */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a0aec0; }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            padding: 40px;
+        }
+
+        h1 {
+            color: var(--text-main);
+            text-align: center;
+            margin-bottom: 40px;
+            font-weight: 800;
+            font-size: 2.2rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .main-layout { display: flex; gap: 30px; }
+        .left-section { flex: 1.2; }
+        .middle-section { flex: 1; }
+        .right-section { flex: 1; }
+
+        /* 文件控制区 */
+        .file-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .file-controls input[type="file"] { display: none; }
+
+        .file-controls label, 
+        .file-controls .btn-save,
+        .file-controls .btn-finish {
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .file-controls label {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+        }
+        .file-controls label:hover { transform: translateY(-1px); box-shadow: 0 4px 6px rgba(102, 126, 234, 0.4); }
+
+        .file-controls .btn-save { 
+            background: white; 
+            color: var(--text-main); 
+            border: 1px solid var(--border-color); 
+        }
+        .file-controls .btn-save:hover { background: var(--bg-gray); border-color: #cbd5e0; transform: translateY(-1px); }
+
+        .file-controls .btn-finish {
+            background: var(--info-color);
+            color: white;
+            box-shadow: 0 2px 4px rgba(66, 153, 225, 0.3);
+            margin-left: auto; 
+        }
+        .file-controls .btn-finish:hover {
+            background: #3182ce; 
+            transform: translateY(-1px); 
+            box-shadow: 0 4px 6px rgba(66, 153, 225, 0.4); 
+        }
+
+        /* 时钟样式 */
+        .clock-display {
+            font-family: 'Ubuntu', monospace;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-main);
+            background: var(--bg-gray);
+            padding: 5px 15px;
+            border-radius: var(--radius-sm);
+            margin-left: 15px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            height: 42px;
+            letter-spacing: 1px;
+        }
+
+        .auto-save-status {
+            font-size: 14px;
+            color: var(--text-sub);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin-left: 15px;
+        }
+
+        .save-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success-color);
+            margin-right: 8px;
+            box-shadow: 0 0 0 2px rgba(72, 187, 120, 0.2);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(72, 187, 120, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(72, 187, 120, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(72, 187, 120, 0); }
+        }
+
+        /* 统一输入框样式 */
+        input[type="text"], input[type="date"], textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            transition: all 0.2s;
+            background: #fff;
+            color: var(--text-main);
+            font-family: inherit;
+        }
+
+        input[type="text"]:focus, input[type="date"]:focus, textarea:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+        }
+
+        /* 统一按钮样式 */
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: inherit;
+        }
+
+        button:active { transform: scale(0.98); }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn-start { background: var(--success-color); color: white; box-shadow: 0 2px 5px rgba(72, 187, 120, 0.3); }
+        .btn-start:hover:not(:disabled) { background: #38a169; transform: translateY(-1px); }
+
+        .btn-pause { background: var(--warning-color); color: white; box-shadow: 0 2px 5px rgba(237, 137, 54, 0.3); }
+        .btn-pause:hover:not(:disabled) { background: #dd6b20; transform: translateY(-1px); }
+
+        .btn-stop { background: var(--danger-color); color: white; box-shadow: 0 2px 5px rgba(245, 101, 101, 0.3); }
+        .btn-stop:hover:not(:disabled) { background: #e53e3e; transform: translateY(-1px); }
+
+        .btn-delete {
+            background: #fff;
+            color: var(--danger-color);
+            border: 1px solid rgba(245, 101, 101, 0.2);
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+        .btn-delete:hover { background: #fff5f5; border-color: var(--danger-color); }
+
+        .btn-add-todo, .btn-add-question {
+            background: var(--secondary-color);
+            color: white;
+            box-shadow: 0 2px 5px rgba(118, 75, 162, 0.3);
+        }
+        .btn-add-todo:hover, .btn-add-question:hover { background: #6b46c1; transform: translateY(-1px); }
+
+        .btn-save-modal { background: white; color: var(--text-main); border: 1px solid var(--border-color); }
+        .btn-save-modal:hover { background: var(--bg-gray); border-color: #cbd5e0; }
+
+        .btn-small { padding: 6px 12px; font-size: 13px; }
+
+        /* 计时器区域 */
+        .task-input-section { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+            margin-bottom: 25px; 
+            background: white;
+            padding: 15px;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .task-input-section input { width: 100%; }
+
+        .task-buttons-row {
+            display: flex;
+            gap: 10px; 
+            width: 100%;
+        }
+
+        .task-buttons-row button { flex: 1; }
+
+        .current-task {
+            background: #fff;
+            padding: 25px;
+            border-radius: var(--radius-md);
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .current-task h2 {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-sub);
+            margin-bottom: 10px;
+        }
+
+        #currentTaskName {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 10px;
+        }
+
+        .timer {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--primary-color);
+            font-variant-numeric: tabular-nums;
+            text-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
+        }
+
+        /* 区域容器 */
+        .records, .todo-section, .question-section { 
+            margin-bottom: 20px; 
+            background: var(--bg-gray); 
+            padding: 25px;
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(0,0,0,0.03);
+            height: 100%;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* 列表项 */
+        .record-item, .todo-item, .question-item {
+            background: white;
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 12px;
+            border: 1px solid var(--border-color);
+            transition: all 0.25s ease;
+            position: relative;
+        }
+
+        .record-item:hover, .todo-item:hover, .question-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: #cbd5e0;
+        }
+
+        /* 记录详情 */
+        .record-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .record-task { font-weight: 700; font-size: 16px; color: var(--text-main); }
+        
+        .record-time { 
+            color: var(--primary-color); 
+            font-weight: 700; 
+            font-family: 'Ubuntu', sans-serif; 
+            font-size: 14px; 
+        }
+        
+        .record-desc {
+            font-size: 14px;
+            color: var(--text-sub);
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed var(--border-color);
+            background: #fafafa;
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        /* 待办事项 */
+        .todo-item { display: flex; align-items: center; justify-content: space-between; }
+        .todo-item.completed { opacity: 0.6; background: #f9f9f9; }
+        .todo-item.overdue { border-left: 4px solid var(--danger-color); }
+
+        .todo-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            flex: 1;
+            margin-right: 15px;
+        }
+
+        .todo-checkbox {
+            width: 20px;
+            height: 20px;
+            margin-top: 3px;
+            cursor: pointer;
+            border-radius: 4px;
+            border: 2px solid #cbd5e0;
+        }
+
+        .todo-text { font-weight: 700; color: var(--text-main); font-size: 15px; }
+        .todo-subtitle { font-size: 13px; color: var(--text-sub); margin-top: 4px; }
+        
+        .todo-deadline {
+            font-size: 12px;
+            color: var(--warning-color);
+            margin-top: 4px;
+            font-weight: 600;
+            background: rgba(237, 137, 54, 0.1);
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* 灵感/问题 */
+        .question-item { display: flex; justify-content: space-between; align-items: center; }
+        .question-item.answered { border-left: 4px solid var(--success-color); }
+        
+        .question-content { flex: 1; margin-right: 15px; cursor: pointer; }
+        .question-text { font-weight: 500; font-size: 15px; }
+        .question-status {
+            font-size: 12px;
+            color: var(--success-color);
+            margin-top: 4px;
+            display: block;
+            font-weight: 600;
+        }
+
+        .no-records {
+            text-align: center;
+            color: var(--text-sub);
+            padding: 30px;
+            font-style: italic;
+            background: rgba(0,0,0,0.02);
+            border-radius: var(--radius-sm);
+        }
+
+        .todo-input-section, .question-input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+            background: white;
+            padding: 15px;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border: none;
+            padding: 35px;
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+            animation: slideDown 0.3s;
+        }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .modal-header h2 { font-size: 20px; font-weight: 700; margin: 0; color: var(--text-main); }
+        
+        .close { color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; transition: color 0.2s; }
+        .close:hover { color: var(--text-main); }
+
+        .modal-body { margin-bottom: 25px; }
+        .modal-body label { display: block; color: var(--text-main); font-size: 14px; font-weight: 600; margin-bottom: 8px; margin-top: 15px; }
+        .modal-body label:first-child { margin-top: 0; }
+
+        .modal-footer { display: flex; justify-content: flex-end; gap: 10px; }
+
+        @media (max-width: 1024px) {
+            .main-layout { flex-direction: column; }
+            .container { padding: 20px; }
+            .file-controls { flex-direction: column; align-items: stretch; }
+            .file-controls .btn-finish { margin-left: 0; margin-top: 10px; }
+            .clock-display { margin-left: 0; margin-top: 10px; justify-content: center; } 
+            .auto-save-status { justify-content: center; margin-top: 10px; margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⏱️ 任务时间记录系统 - Cloud Pro</h1>
+        
+        <div class="file-controls">
+            <label for="fileInput">📂 加载本地数据</label>
+            <input type="file" id="fileInput" accept=".json" onchange="loadFromFile(event)">
+            <button class="btn-save" onclick="saveToFile()">💾 导出备份</button>
+            <button class="btn-finish" onclick="exportToExcel()">📊 导出表格</button>
+            
+            <div id="sysClock" class="clock-display">00:00:00</div>
+
+            <div class="auto-save-status">
+                <span class="save-indicator"></span>
+                <span id="saveStatus">就绪</span>
+            </div>
+        </div>
+        
+        <div class="main-layout">
+            <div class="left-section">
+                <div class="records">
+                    <h2 class="section-title">📅 今日足迹</h2>
+                    
+                    <div class="task-input-section">
+                        <input type="text" id="taskInput" placeholder="准备开始什么任务？...">
+                        
+                        <div class="task-buttons-row">
+                            <button class="btn-start" id="startBtn" onclick="startTask()">开始专注</button>
+                            <button class="btn-pause" id="pauseBtn" onclick="pauseTask()" disabled>暂停</button>
+                            <button class="btn-stop" id="stopBtn" onclick="stopTask()" disabled>完成</button>
+                        </div>
+                    </div>
+
+                    <div class="current-task" id="currentTaskSection" style="display: none;">
+                        <h2>正在进行</h2>
+                        <div id="currentTaskName"></div>
+                        <div class="timer" id="timer">00:00:00</div>
+                    </div>
+
+                    <div id="recordsList">
+                        <div class="no-records">今天还没有开始记录，加油！</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="middle-section">
+                <div class="todo-section">
+                    <h2 class="section-title">📝 待办清单</h2>
+                    <div class="todo-input-section">
+                        <input type="text" id="todoInput" placeholder="输入待办事项...">
+                        <input type="text" id="todoSubtitleInput" placeholder="补充描述（可选，如步骤、备注）...">
+                        <input type="date" id="todoDeadline">
+                        <button class="btn-add-todo" onclick="addTodo()">添加任务</button>
+                    </div>
+                    <div id="todoList">
+                        <div class="no-records">暂无待办</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-section">
+                <div class="question-section">
+                    <h2 class="section-title">💡 灵感洞察</h2>
+                    <div class="question-input-section">
+                        <input type="text" id="questionInput" placeholder="捕捉闪念、问题或改进点...">
+                        <button class="btn-add-question" onclick="addQuestion()">记录想法</button>
+                    </div>
+                    <div id="questionList">
+                        <div class="no-records">静候灵感降临...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="todoEditModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✏️ 编辑待办</h2>
+                <span class="close" onclick="closeTodoEditModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <label>待办内容：</label>
+                <input type="text" id="editTodoText" placeholder="输入待办事项...">
+                
+                <label>补充描述：</label>
+                <input type="text" id="editTodoSubtitle" placeholder="补充任务描述（副标题）...">
+
+                <label>截止日期：</label>
+                <input type="date" id="editTodoDeadline">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-save-modal" onclick="closeTodoEditModal()">取消</button>
+                <button class="btn-start" onclick="saveTodoEdit()">保存修改</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="answerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>💡 深度思考</h2>
+                <span class="close" onclick="closeAnswerModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <label>原始内容：</label>
+                <p id="modalQuestionText" style="margin-bottom: 20px; color: var(--text-main); font-weight: 500; font-size: 16px; padding: 10px; background: var(--bg-gray); border-radius: 8px;"></p>
+                <label>洞察/解决方案：</label>
+                <textarea id="answerInput" placeholder="在这里深化您的思考，记录解决方案或后续行动..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-save-modal" onclick="closeAnswerModal()">取消</button>
+                <button class="btn-start" onclick="saveAnswer()">保存记录</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="descModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📝 任务复盘</h2>
+                <span class="close" onclick="closeDescModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <label>任务名称：</label>
+                <p id="modalRecordTask" style="margin-bottom: 20px; font-weight: 600; font-size: 16px;"></p>
+                <label>补充描述/复盘：</label>
+                <textarea id="descInput" placeholder="记录这个任务的完成情况、遇到的问题或成果..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-save-modal" onclick="closeDescModal()">取消</button>
+                <button class="btn-start" onclick="saveDescription()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="importModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📥 导入数据确认</h2>
+                <span class="close" onclick="closeImportModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 20px; font-size: 16px;">您希望如何处理数据？</p>
+                <div style="background: var(--bg-gray); padding: 15px; border-radius: 8px; font-size: 14px; color: var(--text-sub);">
+                    <p style="margin-bottom: 8px;"><strong>选项 1: 清空并导入</strong><br>仅导入待办和灵感，清空今日的所有计时记录（适合新的一天）。</p>
+                    <p><strong>选项 2: 全部导入</strong><br>恢复所有数据，包括计时记录（适合恢复工作现场）。</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-save-modal" onclick="confirmImport(true)">清空记录</button>
+                <button class="btn-start" onclick="confirmImport(false)">全部恢复</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 修改点：将核心变量挂载到 window 对象上
+        // ==========================================
+        window.currentTask = null;
+        window.startTime = null;
+        window.pausedTime = 0;
+        window.timerInterval = null;
+        window.isPaused = false;
+        window.records = [];
+        window.todos = [];
+        window.questions = [];
+        
+        let autoSaveInterval = null;
+        let currentQuestionId = null;
+        let currentRecordIndex = null;
+        let currentTodoId = null;
+        let pendingImportData = null;
+
+        // 辅助函数：更新所有列表 UI (供云端同步调用)
+        window.refreshAllUI = function() {
+            updateRecordsList();
+            updateTodoList();
+            updateQuestionList();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            startAutoSave();
+            updateRecordsList();
+            updateTodoList();
+            updateQuestionList();
+            
+            // 启动时钟
+            updateSystemTime();
+            setInterval(updateSystemTime, 1000);
+
+            const hasData = checkIfHasData();
+            if (!hasData) {
+                updateSaveStatus('就绪');
+            }
+        });
+        
+        // 更新系统时钟
+        function updateSystemTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('zh-CN', { hour12: false });
+            document.getElementById('sysClock').textContent = timeStr;
+        }
+
+        function checkIfHasData() {
+            return window.records.length > 0 || window.todos.length > 0 || window.questions.length > 0 || window.currentTask !== null;
+        }
+
+        function startAutoSave() {
+            autoSaveInterval = setInterval(() => {
+                saveToFile(true);
+            }, 1200000); // 20分钟自动保存一次
+        }
+
+        function saveToFile(isAuto = false) {
+            const data = {
+                records: window.records.map(r => ({
+                    task: r.task,
+                    duration: r.duration,
+                    timestamp: r.timestamp instanceof Date ? r.timestamp.toISOString() : r.timestamp,
+                    description: r.description || ''
+                })),
+                todos: window.todos,
+                questions: window.questions,
+                currentTask: window.currentTask,
+                startTime: window.startTime,
+                pausedTime: window.pausedTime,
+                isPaused: window.isPaused,
+                date: new Date().toDateString(),
+                lastSaved: new Date().toISOString()
+            };
+
+            const jsonStr = JSON.stringify(data, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            
+            const now = new Date();
+            const timeStr = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}-${String(now.getSeconds()).padStart(2, '0')}`;
+            a.href = url;
+            a.download = `${timeStr}.json`;
+            
+            // 如果是手动点击保存，则下载文件作为备份
+            if (!isAuto) {
+                a.click();
+            }
+            
+            URL.revokeObjectURL(url);
+
+            // === 新增：如果定义了云端保存函数，则调用 ===
+            if (window.saveToCloud) {
+                window.saveToCloud(isAuto);
+            } else if (!isAuto) {
+                updateSaveStatus('✅ 本地已备份');
+            }
+        }
+
+        function loadFromFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    pendingImportData = JSON.parse(e.target.result);
+                    document.getElementById('importModal').style.display = 'block';
+                } catch (error) {
+                    alert('文件格式错误，无法加载数据！');
+                    updateSaveStatus('❌ 加载失败');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        function closeImportModal() {
+            document.getElementById('importModal').style.display = 'none';
+            pendingImportData = null;
+        }
+
+        function confirmImport(clearRecords) {
+            if (!pendingImportData) return;
+
+            try {
+                const data = pendingImportData;
+                
+                window.todos = data.todos || [];
+                window.questions = data.questions || [];
+                
+                if (!clearRecords) {
+                    window.records = (data.records || []).map(r => {
+                        let timestamp;
+                        if (r.timestamp) {
+                            timestamp = new Date(r.timestamp);
+                            if (isNaN(timestamp.getTime())) {
+                                timestamp = new Date(); 
+                            }
+                        } else {
+                            timestamp = new Date(); 
+                        }
+
+                        return {
+                            task: r.task || '未知任务',
+                            duration: Number(r.duration) || 0,
+                            timestamp: timestamp,
+                            description: r.description || ''
+                        };
+                    });
+                    
+                    window.currentTask = data.currentTask;
+                    window.startTime = data.startTime;
+                    window.pausedTime = data.pausedTime;
+                    window.isPaused = data.isPaused;
+
+                    if (window.currentTask && window.startTime) {
+                        document.getElementById('currentTaskSection').style.display = 'block';
+                        document.getElementById('currentTaskName').textContent = window.currentTask;
+                        document.getElementById('taskInput').value = window.currentTask;
+                        document.getElementById('taskInput').disabled = true;
+                        document.getElementById('startBtn').disabled = true;
+                        document.getElementById('pauseBtn').disabled = false;
+                        document.getElementById('stopBtn').disabled = false;
+
+                        if (window.isPaused) {
+                            document.getElementById('pauseBtn').textContent = '继续';
+                        } else {
+                            if (window.timerInterval) clearInterval(window.timerInterval);
+                            window.timerInterval = setInterval(updateTimer, 1000);
+                        }
+                        updateTimer();
+                    }
+                } else {
+                    window.records = []; 
+                }
+
+                updateRecordsList();
+                updateTodoList();
+                updateQuestionList();
+                closeImportModal();
+                updateSaveStatus('✅ 数据导入成功！');
+                
+                // 导入后也同步到云端
+                if (window.saveToCloud) {
+                    window.saveToCloud(true);
+                }
+
+            } catch (err) {
+                console.error("导入出错:", err);
+                alert("导入数据时发生错误，请检查文件格式。");
+            }
+        }
+
+        function updateSaveStatus(message) {
+            document.getElementById('saveStatus').textContent = message;
+        }
+
+        function addTodo() {
+            const todoInput = document.getElementById('todoInput');
+            const subtitleInput = document.getElementById('todoSubtitleInput');
+            const deadlineInput = document.getElementById('todoDeadline');
+            const todoText = todoInput.value.trim();
+            const todoSubtitle = subtitleInput.value.trim();
+            
+            if (!todoText) {
+                alert('请输入待办事项！');
+                return;
+            }
+
+            window.todos.push({
+                id: Date.now(),
+                text: todoText,
+                subtitle: todoSubtitle,
+                completed: false,
+                deadline: deadlineInput.value || null,
+                createdAt: new Date().toISOString()
+            });
+
+            todoInput.value = '';
+            subtitleInput.value = '';
+            deadlineInput.value = '';
+            updateTodoList();
+        }
+
+        function toggleTodo(id) {
+            const todo = window.todos.find(t => t.id === id);
+            if (todo) {
+                todo.completed = !todo.completed;
+                if (todo.completed) {
+                    setTimeout(() => {
+                        window.todos = window.todos.filter(t => t.id !== id);
+                        updateTodoList();
+                    }, 500);
+                }
+                updateTodoList();
+            }
+        }
+
+        function isOverdue(deadline) {
+            if (!deadline) return false;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const deadlineDate = new Date(deadline);
+            deadlineDate.setHours(0, 0, 0, 0);
+            return deadlineDate < today;
+        }
+
+        function formatDeadline(deadline) {
+            if (!deadline) return '';
+            const date = new Date(deadline);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const deadlineDate = new Date(deadline);
+            deadlineDate.setHours(0, 0, 0, 0);
+            
+            const diffTime = deadlineDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays < 0) {
+                return `逾期 ${Math.abs(diffDays)} 天`;
+            } else if (diffDays === 0) {
+                return '今天截止';
+            } else if (diffDays === 1) {
+                return '明天截止';
+            } else {
+                return `${diffDays} 天后`;
+            }
+        }
+
+        function updateTodoList() {
+            const todoList = document.getElementById('todoList');
+            
+            if (window.todos.length === 0) {
+                todoList.innerHTML = '<div class="no-records">暂无待办</div>';
+                return;
+            }
+
+            todoList.innerHTML = window.todos.map(todo => `
+                <div class="todo-item ${todo.completed ? 'completed' : ''} ${isOverdue(todo.deadline) ? 'overdue' : ''}">
+                    <div class="todo-header">
+                        <input type="checkbox" 
+                               class="todo-checkbox" 
+                               ${todo.completed ? 'checked' : ''} 
+                               onchange="toggleTodo(${todo.id})">
+                        <div class="todo-content">
+                            <div class="todo-text">${todo.text}</div>
+                            ${todo.subtitle ? `<div class="todo-subtitle">${todo.subtitle}</div>` : ''}
+                            ${todo.deadline ? `<div class="todo-deadline">📅 ${formatDeadline(todo.deadline)}</div>` : ''}
+                        </div>
+                    </div>
+                    
+                    <button class="btn-start btn-small" style="background:var(--bg-gray); color:var(--text-sub); box-shadow:none; border:1px solid var(--border-color);" onclick="openTodoEditModal(${todo.id})">编辑</button>
+                </div>
+            `).join('');
+        }
+
+        function openTodoEditModal(id) {
+            const todo = window.todos.find(t => t.id === id);
+            if (!todo) return;
+
+            currentTodoId = id;
+            document.getElementById('editTodoText').value = todo.text;
+            document.getElementById('editTodoSubtitle').value = todo.subtitle || '';
+            document.getElementById('editTodoDeadline').value = todo.deadline || '';
+            document.getElementById('todoEditModal').style.display = 'block';
+        }
+
+        function closeTodoEditModal() {
+            document.getElementById('todoEditModal').style.display = 'none';
+            currentTodoId = null;
+        }
+
+        function saveTodoEdit() {
+            if (!currentTodoId) return;
+
+            const todo = window.todos.find(t => t.id === currentTodoId);
+            if (!todo) return;
+
+            const newText = document.getElementById('editTodoText').value.trim();
+            const newSubtitle = document.getElementById('editTodoSubtitle').value.trim();
+            const newDeadline = document.getElementById('editTodoDeadline').value;
+
+            if (!newText) {
+                alert('待办内容不能为空！');
+                return;
+            }
+
+            todo.text = newText;
+            todo.subtitle = newSubtitle;
+            todo.deadline = newDeadline || null;
+
+            updateTodoList();
+            closeTodoEditModal();
+        }
+
+        function addQuestion() {
+            const questionInput = document.getElementById('questionInput');
+            const questionText = questionInput.value.trim();
+            
+            if (!questionText) {
+                alert('请输入内容！');
+                return;
+            }
+
+            window.questions.push({
+                id: Date.now(),
+                question: questionText,
+                answer: '',
+                answered: false,
+                createdAt: new Date().toISOString()
+            });
+
+            questionInput.value = '';
+            updateQuestionList();
+        }
+
+        function openAnswerModal(id) {
+            const question = window.questions.find(q => q.id === id);
+            if (!question) return;
+
+            currentQuestionId = id;
+            document.getElementById('modalQuestionText').textContent = question.question;
+            document.getElementById('answerInput').value = question.answer || '';
+            document.getElementById('answerModal').style.display = 'block';
+        }
+
+        function closeAnswerModal() {
+            document.getElementById('answerModal').style.display = 'none';
+            currentQuestionId = null;
+        }
+
+        function saveAnswer() {
+            if (!currentQuestionId) return;
+
+            const answer = document.getElementById('answerInput').value.trim();
+            const question = window.questions.find(q => q.id === currentQuestionId);
+            
+            if (question) {
+                question.answer = answer;
+                question.answered = answer.length > 0;
+            }
+
+            updateQuestionList();
+            closeAnswerModal();
+        }
+        
+        function deleteQuestion(id) {
+            if (confirm('确定要删除这条记录吗？')) {
+                window.questions = window.questions.filter(q => q.id !== id);
+                updateQuestionList();
+                updateSaveStatus('✅ 记录已删除');
+            }
+        }
+
+        function updateQuestionList() {
+            const questionList = document.getElementById('questionList');
+            
+            if (window.questions.length === 0) {
+                questionList.innerHTML = '<div class="no-records">暂无灵感与洞察</div>';
+                return;
+            }
+
+            questionList.innerHTML = window.questions.map(q => `
+                <div class="question-item ${q.answered ? 'answered' : ''}">
+                    <div class="question-content" onclick="openAnswerModal(${q.id})">
+                        <div class="question-text">${q.question}</div>
+                        ${q.answered ? '<span class="question-status">✓ 已记录洞察/解决方案</span>' : ''}
+                    </div>
+                    <button class="btn-delete btn-small" onclick="deleteQuestion(${q.id})">删除</button>
+                </div>
+            `).join('');
+        }
+
+        function openDescModal(index) {
+            currentRecordIndex = index;
+            const record = window.records[index];
+            document.getElementById('modalRecordTask').textContent = record.task;
+            document.getElementById('descInput').value = record.description || '';
+            document.getElementById('descModal').style.display = 'block';
+        }
+
+        function closeDescModal() {
+            document.getElementById('descModal').style.display = 'none';
+            currentRecordIndex = null;
+        }
+
+        function saveDescription() {
+            if (currentRecordIndex === null) return;
+
+            const description = document.getElementById('descInput').value.trim();
+            window.records[currentRecordIndex].description = description;
+
+            updateRecordsList();
+            closeDescModal();
+        }
+
+        function startTask() {
+            const taskInput = document.getElementById('taskInput');
+            const taskName = taskInput.value.trim();
+            
+            if (!taskName) {
+                alert('请输入任务名称！');
+                return;
+            }
+
+            window.currentTask = taskName;
+            window.startTime = Date.now() - window.pausedTime;
+            window.isPaused = false;
+            
+            document.getElementById('currentTaskSection').style.display = 'block';
+            document.getElementById('currentTaskName').textContent = taskName;
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('pauseBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = false;
+            taskInput.disabled = true;
+
+            window.timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function pauseTask() {
+            if (window.isPaused) {
+                window.startTime = Date.now() - window.pausedTime;
+                window.isPaused = false;
+                window.timerInterval = setInterval(updateTimer, 1000);
+                document.getElementById('pauseBtn').textContent = '继续';
+            } else {
+                clearInterval(window.timerInterval);
+                window.pausedTime = Date.now() - window.startTime;
+                window.isPaused = true;
+                document.getElementById('pauseBtn').textContent = '继续';
+            }
+        }
+
+        function stopTask() {
+            clearInterval(window.timerInterval);
+            const endTime = Date.now();
+            const duration = window.pausedTime || (endTime - window.startTime);
+            
+            window.records.push({
+                task: window.currentTask,
+                duration: duration,
+                timestamp: new Date(),
+                description: ''
+            });
+
+            updateRecordsList();
+            resetTask();
+        }
+
+        function resetTask() {
+            window.currentTask = null;
+            window.startTime = null;
+            window.pausedTime = 0;
+            window.isPaused = false;
+            
+            document.getElementById('currentTaskSection').style.display = 'none';
+            document.getElementById('timer').textContent = '00:00:00';
+            document.getElementById('taskInput').value = '';
+            document.getElementById('taskInput').disabled = false;
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('pauseBtn').disabled = true;
+            document.getElementById('pauseBtn').textContent = '暂停';
+            document.getElementById('stopBtn').disabled = true;
+        }
+
+        // 修改：将 updateTimer 挂载到 window，以便 module 脚本调用
+        window.updateTimer = function() {
+            if (!window.startTime) return;
+            const elapsed = Date.now() - window.startTime;
+            const hours = Math.floor(elapsed / 3600000);
+            const minutes = Math.floor((elapsed % 3600000) / 60000);
+            const seconds = Math.floor((elapsed % 60000) / 1000);
+            
+            document.getElementById('timer').textContent = 
+                `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function formatDuration(ms) {
+            const hours = Math.floor(ms / 3600000);
+            const minutes = Math.floor((ms % 3600000) / 60000);
+            const seconds = Math.floor((ms % 60000) / 1000);
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function updateRecordsList() {
+            const recordsList = document.getElementById('recordsList');
+            
+            if (window.records.length === 0) {
+                recordsList.innerHTML = '<div class="no-records">今天还没有开始记录，加油！</div>';
+                return;
+            }
+
+            const htmlContent = window.records.map((record, index) => {
+                let timeString = '时间计算错误';
+                
+                try {
+                    let endTime = record.timestamp;
+                    if (!(endTime instanceof Date)) {
+                        endTime = new Date(endTime);
+                    }
+                    
+                    if (!isNaN(endTime.getTime())) {
+                        const startTimeMs = endTime.getTime() - record.duration;
+                        const startTime = new Date(startTimeMs);
+                        timeString = `${startTime.toLocaleTimeString('zh-CN', {hour: '2-digit', minute:'2-digit'})} -> ${endTime.toLocaleTimeString('zh-CN', {hour: '2-digit', minute:'2-digit'})}`;
+                    } else {
+                        timeString = "历史记录 (无详细时间)";
+                    }
+                } catch (e) {
+                    console.error("Time calculation error:", e);
+                    timeString = "时间数据异常";
+                }
+
+                return {
+                    html: `
+                        <div class="record-item">
+                            <div class="record-header">
+                                <div>
+                                    <div class="record-task">${record.task}</div>
+                                    <small style="color: var(--text-sub); font-size: 13px;">${timeString}</small>
+                                </div>
+                                <div class="record-time">${formatDuration(record.duration)}</div>
+                            </div>
+                            ${record.description ? `<div class="record-desc">${record.description}</div>` : ''}
+                            <div class="record-actions" style="margin-top: 10px;">
+                                <button class="btn-small" style="background:var(--bg-gray); color:var(--text-sub); box-shadow:none; border:1px solid var(--border-color);" onclick="openDescModal(${index})">${record.description ? '编辑复盘' : '添加复盘'}</button>
+                            </div>
+                        </div>
+                    `,
+                    timestamp: record.timestamp
+                };
+            });
+
+            recordsList.innerHTML = htmlContent.reverse().map(item => item.html).join('');
+        }
+
+        function exportToExcel() {
+            if (window.records.length === 0) {
+                alert('今日暂无记录可导出！');
+                return;
+            }
+
+            const data = window.records.map((record, index) => {
+                let startTimeStr = '';
+                let endTimeStr = '';
+                
+                try {
+                    let endTime = record.timestamp instanceof Date ? record.timestamp : new Date(record.timestamp);
+                    if (!isNaN(endTime.getTime())) {
+                        endTimeStr = endTime.toLocaleString('zh-CN');
+                        startTimeStr = (new Date(endTime.getTime() - record.duration)).toLocaleString('zh-CN');
+                    }
+                } catch(e) {}
+
+                return {
+                    '序号': index + 1,
+                    '任务名称': record.task,
+                    '用时': formatDuration(record.duration),
+                    '开始时间': startTimeStr,
+                    '结束时间': endTimeStr,
+                    '复盘/描述': record.description || ''
+                };
+            });
+
+            const totalDuration = window.records.reduce((sum, record) => sum + record.duration, 0);
+            data.push({
+                '序号': '',
+                '任务名称': '总计',
+                '用时': formatDuration(totalDuration),
+                '开始时间': '',
+                '结束时间': '',
+                '复盘/描述': ''
+            });
+
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, '时间记录');
+
+            const now = new Date();
+            const timeStr = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+            XLSX.writeFile(wb, `工作报表_${timeStr}.xlsx`);
+        }
+
+        window.addEventListener('beforeunload', () => {
+            if (checkIfHasData()) {
+                saveToFile(true);
+            }
+        });
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+    </script>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
+      import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+      // 🔴 您提供的最新 Firebase 配置
+      const firebaseConfig = {
+        apiKey: "AIzaSyCgS797yXzTcDRBNHF0pbYYsdKe0b_WB0o",
+        authDomain: "time-tracker-bdb56.firebaseapp.com",
+        projectId: "time-tracker-bdb56",
+        storageBucket: "time-tracker-bdb56.firebasestorage.app",
+        messagingSenderId: "52472082666",
+        appId: "1:52472082666:web:96f2a3b9025adb568be793",
+        measurementId: "G-HN93S2R6WX"
+      };
+
+      // 初始化 Firebase
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+      const db = getFirestore(app);
+      
+      const USER_DOC_ID = "my_daily_data"; 
+
+      // 1. 定义云端保存函数
+      window.saveToCloud = async function(isAuto = false) {
+        const data = {
+            records: window.records || [],
+            todos: window.todos || [],
+            questions: window.questions || [],
+            currentTask: window.currentTask || null,
+            startTime: window.startTime || null,
+            pausedTime: window.pausedTime || 0,
+            isPaused: window.isPaused || false,
+            lastUpdated: new Date().toISOString()
+        };
+
+        try {
+            await setDoc(doc(db, "tracker_data", USER_DOC_ID), data);
+            
+            const statusText = isAuto ? '☁️ 云端已自动同步' : '☁️ 云端保存成功';
+            if (!isAuto) {
+                document.getElementById('saveStatus').textContent = statusText;
+            }
+            console.log(statusText);
+        } catch (e) {
+            console.error("云端保存失败: ", e);
+            document.getElementById('saveStatus').textContent = '❌ 云端同步失败';
+        }
+      };
+
+      // 2. 启动实时监听
+      function startRealtimeSync() {
+        onSnapshot(doc(db, "tracker_data", USER_DOC_ID), (docSnap) => {
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                console.log("收到云端更新:", data);
+                
+                window.records = (data.records || []).map(r => ({
+                    ...r,
+                    timestamp: r.timestamp ? new Date(r.timestamp) : new Date()
+                }));
+                window.todos = data.todos || [];
+                window.questions = data.questions || [];
+                
+                window.currentTask = data.currentTask;
+                window.startTime = data.startTime;
+                window.pausedTime = data.pausedTime;
+                window.isPaused = data.isPaused;
+
+                if (window.refreshAllUI) {
+                    window.refreshAllUI();
+                }
+                
+                const taskSection = document.getElementById('currentTaskSection');
+                if (window.currentTask) {
+                    taskSection.style.display = 'block';
+                    document.getElementById('currentTaskName').textContent = window.currentTask;
+                    document.getElementById('taskInput').value = window.currentTask;
+                    document.getElementById('taskInput').disabled = true;
+                    document.getElementById('startBtn').disabled = true;
+                    document.getElementById('pauseBtn').disabled = false;
+                    document.getElementById('stopBtn').disabled = false;
+                    
+                    if (window.timerInterval) clearInterval(window.timerInterval);
+                    if (!window.isPaused) {
+                         window.timerInterval = setInterval(window.updateTimer, 1000);
+                         document.getElementById('pauseBtn').textContent = '暂停';
+                    } else {
+                        document.getElementById('pauseBtn').textContent = '继续';
+                        if(window.updateTimer) window.updateTimer();
+                    }
+                } else {
+                    taskSection.style.display = 'none';
+                    if (window.timerInterval) clearInterval(window.timerInterval);
+                    document.getElementById('taskInput').disabled = false;
+                    document.getElementById('startBtn').disabled = false;
+                }
+
+                document.getElementById('saveStatus').textContent = '☁️ 数据已同步';
+            }
+        });
+      }
+
+      startRealtimeSync();
+    </script>
+</body>
+</html>
