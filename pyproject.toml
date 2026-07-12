@@ -9,12 +9,16 @@ description = "Offline Huawei VRP configuration parser"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+  "fastapi>=0.115,<1",
   "pydantic>=2.8,<3",
   "PyYAML>=6.0,<7",
+  "python-multipart>=0.0.20,<1",
+  "uvicorn>=0.34,<1",
 ]
 
 [project.optional-dependencies]
 dev = [
+  "httpx>=0.28,<1",
   "pytest>=8.2,<9",
   "pytest-cov>=5,<7",
 ]
