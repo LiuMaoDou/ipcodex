@@ -34,7 +34,7 @@ def _parse_text(text: str, source_name: str) -> dict[str, Any]:
 def create_app(*, max_upload_bytes: int = 2 * 1024 * 1024) -> FastAPI:
     application = FastAPI(title="IPCodex", docs_url=None, redoc_url=None)
 
-    @application.post("/api/parse")
+    @application.post("/api/parse", response_model=None)
     async def parse_configuration(request: Request) -> dict[str, Any] | JSONResponse:
         content_type = request.headers.get("content-type", "")
 
