@@ -37,7 +37,7 @@
 - Produces: `create_app(*, max_upload_bytes: int = 2 * 1024 * 1024) -> FastAPI` and module-level `app`.
 - `POST /api/parse` accepts JSON `{ "text": str, "source_name": str | null }` or multipart field `file`.
 
-- [ ] **Step 1: Add FastAPI test dependencies and write failing API tests**
+- [x] **Step 1: Add FastAPI test dependencies and write failing API tests**
 
 Add runtime dependencies to `pyproject.toml`:
 
@@ -88,7 +88,7 @@ def test_parse_rejects_invalid_input(request_kwargs, status, code) -> None:
     assert response.json()["error"]["code"] == code
 ```
 
-- [ ] **Step 2: Run the API tests and verify the red state**
+- [x] **Step 2: Run the API tests and verify the red state**
 
 Run:
 
@@ -99,7 +99,7 @@ pytest tests/web/test_api.py -v
 
 Expected: collection fails because `ipcodex.web.app` does not exist.
 
-- [ ] **Step 3: Implement request validation and in-memory parsing**
+- [x] **Step 3: Implement request validation and in-memory parsing**
 
 Create `src/ipcodex/web/app.py` with:
 
@@ -176,7 +176,7 @@ app = create_app()
 
 Create an empty `src/ipcodex/web/__init__.py`.
 
-- [ ] **Step 4: Run focused and full tests**
+- [x] **Step 4: Run focused and full tests**
 
 Run:
 
@@ -187,7 +187,7 @@ pytest -q
 
 Expected: all API tests and the existing suite pass.
 
-- [ ] **Step 5: Review and commit**
+- [x] **Step 5: Review and commit**
 
 ```bash
 git diff
@@ -208,7 +208,7 @@ git commit -m "feat: add local configuration parse api"
 - Produces: `run_server(*, host: str, port: int) -> None`.
 - Adds: `ipcodex web [--host HOST] [--port PORT]` with defaults `127.0.0.1` and `8000`.
 
-- [ ] **Step 1: Write a failing CLI delegation test**
+- [x] **Step 1: Write a failing CLI delegation test**
 
 Use `unittest.mock.patch("ipcodex.cli.run_server")` and assert:
 
@@ -220,13 +220,13 @@ def test_cli_starts_local_web_server() -> None:
     run_server.assert_called_once_with(host="127.0.0.1", port=8123)
 ```
 
-- [ ] **Step 2: Run the test and verify failure**
+- [x] **Step 2: Run the test and verify failure**
 
 Run: `pytest tests/test_cli.py::test_cli_starts_local_web_server -v`
 
 Expected: FAIL because the `web` subcommand and `run_server` do not exist.
 
-- [ ] **Step 3: Implement Uvicorn delegation and CLI arguments**
+- [x] **Step 3: Implement Uvicorn delegation and CLI arguments**
 
 Create `src/ipcodex/web/server.py`:
 
@@ -247,7 +247,7 @@ if args.command == "web":
     return 0
 ```
 
-- [ ] **Step 4: Run focused and full tests**
+- [x] **Step 4: Run focused and full tests**
 
 Run:
 
@@ -258,7 +258,7 @@ pytest -q
 
 Expected: all CLI and existing tests pass.
 
-- [ ] **Step 5: Review and commit**
+- [x] **Step 5: Review and commit**
 
 ```bash
 git diff
@@ -282,14 +282,14 @@ git commit -m "feat: start web dashboard from cli"
 - `GET /static/styles.css` and `GET /static/app.js` return packaged assets.
 - Frontend state is `{ inputText, sourceName, status, result, activeSection }` and is never persisted.
 
-- [ ] **Step 1: Produce and approve the complete visual concept**
+- [x] **Step 1: Produce and approve the complete visual concept**
 
 Generate a full desktop dashboard concept for the accepted navigation layout,
 including New Parse, Device Overview, dense tables, warning state, and Raw JSON.
 Extract exact layout, color, typography, spacing, icon, and responsive tokens into
 the implementation notes before editing frontend files.
 
-- [ ] **Step 2: Write failing static asset tests**
+- [x] **Step 2: Write failing static asset tests**
 
 Add tests asserting:
 
@@ -303,19 +303,19 @@ def test_dashboard_and_static_assets_are_served() -> None:
     assert client.get("/static/app.js").status_code == 200
 ```
 
-- [ ] **Step 3: Run the static tests and verify failure**
+- [x] **Step 3: Run the static tests and verify failure**
 
 Run: `pytest tests/web/test_api.py::test_dashboard_and_static_assets_are_served -v`
 
 Expected: FAIL with 404 for `/` or static assets.
 
-- [ ] **Step 4: Serve packaged static assets**
+- [x] **Step 4: Serve packaged static assets**
 
 Resolve `files("ipcodex.web").joinpath("static")`, mount it at `/static`, and
 return `index.html` from `GET /` with `FileResponse`. Ensure Hatch includes the
 HTML, CSS, and JavaScript in the wheel.
 
-- [ ] **Step 5: Implement the dashboard shell and parse input flow**
+- [x] **Step 5: Implement the dashboard shell and parse input flow**
 
 Build semantic HTML with:
 
@@ -331,7 +331,7 @@ memory, switches to overview on success, renders compact tables, expands
 interface evidence rows, copies JSON, downloads deterministic JSON, and manages
 the mobile drawer.
 
-- [ ] **Step 6: Implement the responsive visual system**
+- [x] **Step 6: Implement the responsive visual system**
 
 Use the accepted charcoal, white, neutral gray, green, amber, and red palette.
 Keep radii at 8px or less, use fixed icon-button dimensions, make data tables
@@ -339,7 +339,7 @@ horizontally scrollable, keep the sidebar persistent above 900px, and use an
 overlay drawer below 900px. Add visible focus states and respect
 `prefers-reduced-motion`.
 
-- [ ] **Step 7: Run API tests, full tests, and wheel inspection**
+- [x] **Step 7: Run API tests, full tests, and wheel inspection**
 
 Run:
 
@@ -352,7 +352,7 @@ unzip -l dist/ipcodex-0.1.0-py3-none-any.whl | rg 'ipcodex/web/static'
 
 Expected: all tests pass and all three static assets appear in the wheel.
 
-- [ ] **Step 8: Review and commit**
+- [x] **Step 8: Review and commit**
 
 ```bash
 git diff
@@ -373,19 +373,19 @@ git commit -m "feat: add local parser dashboard"
 - Documents `ipcodex web`, local URL, input options, privacy behavior, and stop procedure.
 - Verifies the complete browser flow against the accepted concept.
 
-- [ ] **Step 1: Add API resilience tests**
+- [x] **Step 1: Add API resilience tests**
 
 Add tests for unsupported content type, missing multipart file, and an injected
 parser exception. Assert stable status codes and verify response JSON contains
 no current working directory or configuration text.
 
-- [ ] **Step 2: Run the new tests and fix only demonstrated defects**
+- [x] **Step 2: Run the new tests and fix only demonstrated defects**
 
 Run: `pytest tests/web/test_api.py -v`
 
 Expected: all resilience tests pass after any required minimal correction.
 
-- [ ] **Step 3: Document local web usage**
+- [x] **Step 3: Document local web usage**
 
 Add to `README.md`:
 
@@ -402,7 +402,7 @@ configuration text. IPCodex processes the configuration locally and does not
 retain it after refresh. Press `Ctrl+C` in the terminal to stop the server.
 ```
 
-- [ ] **Step 4: Start the app and run Browser QA**
+- [x] **Step 4: Start the app and run Browser QA**
 
 Start `ipcodex web --port 8000`, then use the Browser plugin for:
 
@@ -414,14 +414,14 @@ Start `ipcodex web --port 8000`, then use the Browser plugin for:
 6. submit empty input and verify visible recoverable validation;
 7. capture desktop and mobile screenshots and inspect for clipping or overlap.
 
-- [ ] **Step 5: Compare concept and implementation**
+- [x] **Step 5: Compare concept and implementation**
 
 Use `view_image` on the accepted concept and latest desktop/mobile screenshots.
 Record at least five comparison points: layout, typography, palette, navigation,
 table density, responsive drawer, and interaction state. Fix every material
 mismatch and rerun Browser QA.
 
-- [ ] **Step 6: Run final verification**
+- [x] **Step 6: Run final verification**
 
 Run:
 
@@ -434,7 +434,7 @@ ipcodex parse samples/huawei/ce_leaf_minimal.cfg --output build/leaf01.json
 Expected: the complete suite passes, coverage remains at least 90%, and the
 existing CLI output remains valid.
 
-- [ ] **Step 7: Review, commit, and push**
+- [x] **Step 7: Review, commit, and push**
 
 ```bash
 git diff
@@ -443,4 +443,3 @@ git add README.md tests/web/test_api.py src/ipcodex/web
 git commit -m "docs: document local web dashboard"
 git push origin main
 ```
-

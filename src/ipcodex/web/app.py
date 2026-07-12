@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from importlib.resources import files
+from json import JSONDecodeError
 from typing import Any
 
 from fastapi import FastAPI, Request
@@ -42,6 +43,13 @@ def create_app(*, max_upload_bytes: int = 2 * 1024 * 1024) -> FastAPI:
     async def dashboard() -> FileResponse:
         return FileResponse(str(static_root.joinpath("index.html")))
 
+    @application.get("/favicon.ico", include_in_schema=False)
+    async def favicon() -> FileResponse:
+        return FileResponse(
+            str(static_root.joinpath("favicon.svg")),
+            media_type="image/svg+xml",
+        )
+
     @application.post("/api/parse", response_model=None)
     async def parse_configuration(request: Request) -> dict[str, Any] | JSONResponse:
         content_type = request.headers.get("content-type", "")
@@ -60,7 +68,10 @@ def create_app(*, max_upload_bytes: int = 2 * 1024 * 1024) -> FastAPI:
                 return _error(422, "invalid_encoding", "Configuration must be UTF-8.")
             source_name = upload.filename or "uploaded.cfg"
         elif content_type.startswith("application/json"):
-            payload = await request.json()
+            try:
+                payload = await request.json()
+            except JSONDecodeError:
+                return _error(422, "invalid_input", "Configuration input is invalid.")
             if not isinstance(payload, dict):
                 return _error(422, "missing_input", "Paste configuration text.")
             text = payload.get("text", "")

@@ -19,6 +19,17 @@ pytest -q
 ipcodex parse samples/huawei/ce_leaf_minimal.cfg --output build/leaf01.json
 ```
 
+## Local Web Dashboard
+
+```bash
+source .venv/bin/activate
+ipcodex web
+```
+
+Open `http://127.0.0.1:8000`. Upload a Huawei VRP `.cfg`/`.txt` file or paste
+configuration text. IPCodex processes the configuration locally and does not
+retain it after refresh. Press `Ctrl+C` in the terminal to stop the server.
+
 The output contains:
 
 - a lossless configuration tree with source line evidence;

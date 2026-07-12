@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Any
+from unittest.mock import patch
 
 import pytest
 from fastapi.testclient import TestClient
@@ -77,3 +78,55 @@ def test_dashboard_and_static_assets_are_served(client: TestClient) -> None:
     assert 'id="parse-form"' in page.text
     assert client.get("/static/styles.css").status_code == 200
     assert client.get("/static/app.js").status_code == 200
+
+
+def test_favicon_is_served(client: TestClient) -> None:
+    assert client.get("/favicon.ico").status_code == 200
+
+
+def test_parse_rejects_unsupported_media_type(client: TestClient) -> None:
+    response = client.post(
+        "/api/parse",
+        content="sysname Leaf01",
+        headers={"content-type": "text/plain"},
+    )
+
+    assert response.status_code == 415
+    assert response.json()["error"]["code"] == "unsupported_media_type"
+
+
+def test_parse_rejects_malformed_json(client: TestClient) -> None:
+    response = client.post(
+        "/api/parse",
+        content="{broken",
+        headers={"content-type": "application/json"},
+    )
+
+    assert response.status_code == 422
+    assert response.json()["error"]["code"] == "invalid_input"
+
+
+def test_parse_rejects_multipart_without_file(client: TestClient) -> None:
+    response = client.post("/api/parse", files={"other": (None, "value")})
+
+    assert response.status_code == 422
+    assert response.json()["error"]["code"] == "missing_input"
+
+
+def test_parse_failure_does_not_expose_input_or_local_path(
+    client: TestClient,
+    tmp_path,
+) -> None:
+    secret_text = "sysname PRIVATE-DEVICE"
+    with patch("ipcodex.web.app._parse_text", side_effect=RuntimeError(tmp_path)):
+        response = client.post(
+            "/api/parse",
+            json={"text": secret_text, "source_name": "private.cfg"},
+        )
+
+    payload = response.json()
+    serialized = str(payload)
+    assert response.status_code == 500
+    assert payload["error"]["code"] == "parse_failed"
+    assert secret_text not in serialized
+    assert str(tmp_path) not in serialized

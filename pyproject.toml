@@ -9,7 +9,7 @@ description = "Offline Huawei VRP configuration parser"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-  "fastapi>=0.115,<1",
+  "fastapi>=0.115,<0.116",
   "pydantic>=2.8,<3",
   "PyYAML>=6.0,<7",
   "python-multipart>=0.0.20,<1",
