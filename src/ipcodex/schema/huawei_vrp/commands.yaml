@@ -1,0 +1,92 @@
+commands:
+  - id: system_sysname
+    views: [system]
+    pattern: '^sysname (?P<hostname>\S+)$'
+    parameters:
+      - {name: hostname, type: identifier}
+    semantic_handler: system.sysname
+
+  - id: system_vlan_batch
+    views: [system]
+    pattern: '^vlan batch (?P<vlan_expression>.+)$'
+    parameters:
+      - {name: vlan_expression, type: vlan_expression}
+    semantic_handler: network.vlan_batch
+
+  - id: interface_description
+    views: [interface]
+    pattern: '^description (?P<description>.+)$'
+    parameters:
+      - {name: description, type: string}
+    semantic_handler: interface.description
+
+  - id: interface_shutdown
+    views: [interface]
+    pattern: '^shutdown$'
+    parameters: []
+    semantic_handler: interface.shutdown
+
+  - id: interface_undo_shutdown
+    views: [interface]
+    pattern: '^undo shutdown$'
+    parameters: []
+    semantic_handler: interface.undo_shutdown
+
+  - id: interface_undo_portswitch
+    views: [interface]
+    pattern: '^undo portswitch$'
+    parameters: []
+    semantic_handler: interface.undo_portswitch
+
+  - id: interface_ip_address
+    views: [interface]
+    pattern: '^ip address (?P<address>\S+) (?P<mask>\S+)(?: (?P<sub>sub))?$'
+    parameters:
+      - {name: address, type: ipv4_address}
+      - {name: mask, type: ipv4_netmask_or_prefix}
+      - {name: sub, type: boolean_token, required: false}
+    semantic_handler: interface.ip_address
+
+  - id: interface_bind_vrf
+    views: [interface]
+    pattern: '^ip binding vpn-instance (?P<vrf_name>\S+)$'
+    parameters:
+      - {name: vrf_name, type: identifier}
+    semantic_handler: interface.bind_vrf
+
+  - id: interface_eth_trunk_member
+    views: [interface]
+    pattern: '^eth-trunk (?P<trunk_id>\d+)$'
+    parameters:
+      - {name: trunk_id, type: integer}
+    semantic_handler: interface.eth_trunk_member
+
+  - id: vpn_rd
+    views: [vpn_ipv4_family]
+    pattern: '^route-distinguisher (?P<rd>\S+)$'
+    parameters:
+      - {name: rd, type: route_distinguisher}
+    semantic_handler: network.vpn_rd
+
+  - id: vpn_target
+    views: [vpn_ipv4_family]
+    pattern: '^vpn-target (?P<rt>\S+) (?P<direction>import-extcommunity|export-extcommunity)$'
+    parameters:
+      - {name: rt, type: route_target}
+      - {name: direction, type: enum}
+    semantic_handler: network.vpn_target
+
+  - id: static_route_ipv4
+    views: [system]
+    pattern: '^ip route-static (?P<prefix>\S+) (?P<mask>\S+) (?P<next_hop>\S+)(?: preference (?P<preference>\d+))?$'
+    parameters:
+      - {name: prefix, type: ipv4_address}
+      - {name: mask, type: ipv4_netmask_or_prefix}
+      - {name: next_hop, type: ipv4_address}
+      - {name: preference, type: integer, required: false}
+    semantic_handler: network.static_route
+
+  - id: system_return
+    views: [system]
+    pattern: '^return$'
+    parameters: []

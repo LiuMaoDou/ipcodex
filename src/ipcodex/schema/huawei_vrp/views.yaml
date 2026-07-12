@@ -1,0 +1,22 @@
+vendor: huawei
+os: vrp
+schema_version: "0.1.0"
+views:
+  - id: system
+    allowed_parents: []
+    closes_on_hash: false
+
+  - id: interface
+    enter_pattern: '^interface (?P<interface_name>\S+)$'
+    allowed_parents: [system]
+    closes_on_hash: true
+
+  - id: vpn_instance
+    enter_pattern: '^ip vpn-instance (?P<vrf_name>\S+)$'
+    allowed_parents: [system]
+    closes_on_hash: true
+
+  - id: vpn_ipv4_family
+    enter_pattern: '^ipv4-family$'
+    allowed_parents: [vpn_instance]
+    closes_on_hash: true
