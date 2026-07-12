@@ -67,3 +67,13 @@ def test_parse_rejects_invalid_input(
 
     assert response.status_code == status
     assert response.json()["error"]["code"] == code
+
+
+def test_dashboard_and_static_assets_are_served(client: TestClient) -> None:
+    page = client.get("/")
+
+    assert page.status_code == 200
+    assert "IPCodex" in page.text
+    assert 'id="parse-form"' in page.text
+    assert client.get("/static/styles.css").status_code == 200
+    assert client.get("/static/app.js").status_code == 200

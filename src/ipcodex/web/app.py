@@ -4,7 +4,9 @@ from importlib.resources import files
 from typing import Any
 
 from fastapi import FastAPI, Request
+from fastapi.responses import FileResponse
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from starlette.datastructures import UploadFile
 
 from ipcodex.cst.parser import parse_cst
@@ -33,6 +35,12 @@ def _parse_text(text: str, source_name: str) -> dict[str, Any]:
 
 def create_app(*, max_upload_bytes: int = 2 * 1024 * 1024) -> FastAPI:
     application = FastAPI(title="IPCodex", docs_url=None, redoc_url=None)
+    static_root = files("ipcodex.web").joinpath("static")
+    application.mount("/static", StaticFiles(directory=str(static_root)), name="static")
+
+    @application.get("/", include_in_schema=False)
+    async def dashboard() -> FileResponse:
+        return FileResponse(str(static_root.joinpath("index.html")))
 
     @application.post("/api/parse", response_model=None)
     async def parse_configuration(request: Request) -> dict[str, Any] | JSONResponse:

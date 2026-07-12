@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>IPCodex · Huawei VRP Parser</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="主导航">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M4 7h16M7 4v6m10-6v6M5 14h4v4H5zm10 0h4v4h-4zm-6 2h6"/></svg>
+        </div>
+        <div><strong>IPCodex</strong><span>Huawei VRP Parser</span></div>
+      </div>
+      <div class="local-status"><span></span>本机运行 · 不保存配置</div>
+      <nav class="nav-list">
+        <button class="nav-item is-active" data-section="parse" type="button">
+          <svg viewBox="0 0 24 24"><path d="M12 3v12m-4-4 4 4 4-4M5 19h14"/></svg><span>新建解析</span>
+        </button>
+        <div class="nav-label">解析结果</div>
+        <button class="nav-item result-nav" data-section="overview" type="button" disabled>
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><span>设备概览</span>
+        </button>
+        <button class="nav-item result-nav" data-section="interfaces" type="button" disabled>
+          <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h.01M11 9h6M7 15h.01M11 15h6"/></svg><span>接口</span><span class="nav-count" id="interfaces-count">0</span>
+        </button>
+        <button class="nav-item result-nav" data-section="vpn" type="button" disabled>
+          <svg viewBox="0 0 24 24"><path d="M12 3 4 7v5c0 5 3.4 8 8 9 4.6-1 8-4 8-9V7z"/><path d="M9 12h6m-3-3v6"/></svg><span>VPN 实例</span><span class="nav-count" id="vpn-count">0</span>
+        </button>
+        <button class="nav-item result-nav" data-section="routes" type="button" disabled>
+          <svg viewBox="0 0 24 24"><circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 18h3a3 3 0 0 0 3-3V9a3 3 0 0 1 3-3"/></svg><span>静态路由</span><span class="nav-count" id="routes-count">0</span>
+        </button>
+        <button class="nav-item result-nav" data-section="unknown" type="button" disabled>
+          <svg viewBox="0 0 24 24"><path d="M10.3 3.3 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.3a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4m0 3h.01"/></svg><span>未知命令</span><span class="nav-count warning" id="unknown-count">0</span>
+        </button>
+        <button class="nav-item result-nav" data-section="json" type="button" disabled>
+          <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m5 13H5a2 2 0 0 1-2-2v-3m13-13h3a2 2 0 0 1 2 2v3m-5 13h3a2 2 0 0 0 2-2v-3M10 9l-2 3 2 3m4-6 2 3-2 3"/></svg><span>原始 JSON</span>
+        </button>
+      </nav>
+      <div class="sidebar-footer"><span>Schema</span><strong id="schema-version">0.1.0</strong></div>
+    </aside>
+
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+    <main class="main-area">
+      <header class="topbar">
+        <button class="icon-button menu-button" id="menu-button" type="button" aria-label="打开导航" title="打开导航">
+          <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+        <div><h1 id="page-title">新建解析</h1><p id="page-subtitle">上传或粘贴 Huawei VRP 配置</p></div>
+        <div class="topbar-actions">
+          <span class="source-chip" id="source-chip" hidden></span>
+          <button class="secondary-button" id="new-parse-button" type="button" hidden>
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>新建解析
+          </button>
+        </div>
+      </header>
+
+      <div class="content">
+        <section class="view is-visible" id="view-parse" data-view="parse">
+          <div class="section-heading"><div><h2>解析配置</h2><p>配置仅在当前页面和本机进程中处理。</p></div></div>
+          <form id="parse-form" novalidate>
+            <div class="input-layout">
+              <div class="drop-zone" id="drop-zone" tabindex="0" role="button" aria-label="选择配置文件">
+                <input id="file-input" type="file" accept=".cfg,.txt,text/plain" hidden>
+                <div class="drop-icon"><svg viewBox="0 0 24 24"><path d="M12 16V4m-4 4 4-4 4 4M5 20h14"/></svg></div>
+                <strong>拖放配置文件到这里</strong>
+                <span>支持 .cfg 和 .txt，最大 2 MiB</span>
+                <button class="secondary-button" id="choose-file" type="button">选择文件</button>
+              </div>
+              <div class="or-divider"><span>或</span></div>
+              <label class="editor-wrap" for="config-text">
+                <span class="editor-label">粘贴配置文本</span>
+                <textarea id="config-text" spellcheck="false" placeholder="sysname Leaf01&#10;#&#10;interface 100GE1/0/1&#10; description TO-SPINE01"></textarea>
+              </label>
+            </div>
+            <div class="file-meta" id="file-meta" hidden>
+              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+              <div><strong id="file-name"></strong><span id="file-size"></span></div>
+              <button class="icon-button" id="clear-file" type="button" aria-label="移除文件" title="移除文件"><svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+            </div>
+            <div class="form-error" id="form-error" role="alert" hidden></div>
+            <div class="form-actions">
+              <span><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>配置不会上传到外部服务</span>
+              <button class="primary-button" id="parse-button" type="submit" disabled><span class="button-label">解析配置</span><span class="spinner" aria-hidden="true"></span></button>
+            </div>
+          </form>
+        </section>
+
+        <section class="view" id="view-overview" data-view="overview">
+          <div class="alert warning-alert" id="reference-alert" hidden></div>
+          <div class="metric-strip" id="metric-strip"></div>
+          <div class="dashboard-grid">
+            <section class="panel coverage-panel"><div class="panel-header"><div><h2>解析覆盖率</h2><p>当前配置的结构与语义识别情况</p></div><span class="status-ok">已完成</span></div><div id="coverage-content"></div></section>
+            <section class="panel"><div class="panel-header"><div><h2>设备信息</h2><p>显式配置摘要</p></div></div><dl class="definition-list" id="device-details"></dl></section>
+          </div>
+          <section class="panel table-panel"><div class="panel-header"><div><h2>接口摘要</h2><p>当前设备的接口与三层信息</p></div><button class="text-button" type="button" data-go="interfaces">查看全部</button></div><div class="table-scroll"><table><thead><tr><th>接口</th><th>模式</th><th>IPv4</th><th>VPN 实例</th><th>描述</th></tr></thead><tbody id="overview-interfaces"></tbody></table></div></section>
+        </section>
+
+        <section class="view" id="view-interfaces" data-view="interfaces"><div class="section-heading"><div><h2>接口</h2><p>点击行查看显式值和源配置证据。</p></div></div><div class="panel table-panel"><div class="table-scroll"><table><thead><tr><th>接口</th><th>模式</th><th>管理状态</th><th>IPv4</th><th>VPN 实例</th><th>Eth-Trunk</th><th></th></tr></thead><tbody id="interfaces-table"></tbody></table></div></div></section>
+        <section class="view" id="view-vpn" data-view="vpn"><div class="section-heading"><div><h2>VPN 实例</h2><p>路由标识符与 Route Target。</p></div></div><div class="panel table-panel"><div class="table-scroll"><table><thead><tr><th>名称</th><th>RD</th><th>Import RT</th><th>Export RT</th><th>源行</th></tr></thead><tbody id="vpn-table"></tbody></table></div></div></section>
+        <section class="view" id="view-routes" data-view="routes"><div class="section-heading"><div><h2>静态路由</h2><p>规范化后的 IPv4 静态路由。</p></div></div><div class="panel table-panel"><div class="table-scroll"><table><thead><tr><th>目的前缀</th><th>下一跳</th><th>优先级</th><th>源行</th></tr></thead><tbody id="routes-table"></tbody></table></div></div></section>
+        <section class="view" id="view-unknown" data-view="unknown"><div class="section-heading"><div><h2>未知命令</h2><p>结构已保留，但当前 Schema 尚未识别的命令。</p></div></div><div class="panel table-panel unknown-panel"><div class="table-scroll"><table><thead><tr><th>行号</th><th>当前视图</th><th>原始命令</th><th>原因</th></tr></thead><tbody id="unknown-table"></tbody></table></div></div></section>
+        <section class="view" id="view-json" data-view="json"><div class="section-heading json-heading"><div><h2>原始 JSON</h2><p>确定性序列化的完整解析结果。</p></div><div><button class="icon-button" id="copy-json" type="button" aria-label="复制 JSON" title="复制 JSON"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button><button class="icon-button" id="download-json" type="button" aria-label="下载 JSON" title="下载 JSON"><svg viewBox="0 0 24 24"><path d="M12 3v12m-4-4 4 4 4-4M5 21h14"/></svg></button></div></div><pre class="json-viewer" id="json-viewer"></pre></section>
+      </div>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="/static/app.js" defer></script>
+</body>
+</html>
