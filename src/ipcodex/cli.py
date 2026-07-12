@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Sequence
 
 from ipcodex.pipeline import parse_file
+from ipcodex.web.server import run_server
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -16,6 +17,10 @@ def _build_parser() -> argparse.ArgumentParser:
     parse_parser.add_argument("input", type=Path)
     parse_parser.add_argument("--output", type=Path, required=True)
     parse_parser.add_argument("--schema-root", type=Path)
+
+    web_parser = subparsers.add_parser("web")
+    web_parser.add_argument("--host", default="127.0.0.1")
+    web_parser.add_argument("--port", type=int, default=8000)
     return parser
 
 
@@ -30,6 +35,10 @@ def main(argv: Sequence[str] | None = None) -> int:
             json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
         )
+        return 0
+
+    if args.command == "web":
+        run_server(host=args.host, port=args.port)
         return 0
 
     raise AssertionError(f"Unhandled command: {args.command}")
