@@ -162,7 +162,7 @@ def parse_file(path: Path, *, schema_root: Path | None = None) -> "ParseResult":
 - Produces package version constant `ipcodex.__version__: str`.
 - Produces module entry point `python -m ipcodex` that delegates to `ipcodex.cli.main` after Task 9.
 
-- [ ] **Step 1: Initialize the repository**
+- [x] **Step 1: Initialize the repository**
 
 Run from `IPCodex/`:
 
@@ -173,7 +173,7 @@ git branch -M main
 
 Expected: an empty Git repository on branch `main`.
 
-- [ ] **Step 2: Write the failing package import test**
+- [x] **Step 2: Write the failing package import test**
 
 Create `tests/test_package.py`:
 
@@ -185,7 +185,7 @@ def test_package_exposes_version() -> None:
     assert __version__ == "0.1.0"
 ```
 
-- [ ] **Step 3: Create `pyproject.toml`**
+- [x] **Step 3: Create `pyproject.toml`**
 
 ```toml
 [build-system]
@@ -224,7 +224,7 @@ source = ["ipcodex"]
 branch = true
 ```
 
-- [ ] **Step 4: Create the package files**
+- [x] **Step 4: Create the package files**
 
 Create `src/ipcodex/__init__.py`:
 
@@ -249,7 +249,7 @@ def main() -> int:
     return 0
 ```
 
-- [ ] **Step 5: Create the initial README**
+- [x] **Step 5: Create the initial README**
 
 Create `README.md`:
 
@@ -270,7 +270,7 @@ pytest -q
 ```
 ````
 
-- [ ] **Step 6: Install and run the test**
+- [x] **Step 6: Install and run the test**
 
 Run:
 
@@ -283,7 +283,7 @@ pytest tests/test_package.py -v
 
 Expected: `1 passed`.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add pyproject.toml README.md src tests/test_package.py
@@ -303,7 +303,7 @@ git commit -m "chore: bootstrap ipcodex parser project"
 - `SourceLine.raw_text` is immutable evidence.
 - `SourceLine.normalized_text` removes terminal paging/control artifacts but does not remove indentation or `#` separators.
 
-- [ ] **Step 1: Write failing preprocessing tests**
+- [x] **Step 1: Write failing preprocessing tests**
 
 Create `tests/test_source.py`:
 
@@ -342,7 +342,7 @@ def test_blank_lines_are_retained_but_marked() -> None:
     assert document.lines[1].is_blank is True
 ```
 
-- [ ] **Step 2: Run the tests and verify failure**
+- [x] **Step 2: Run the tests and verify failure**
 
 ```bash
 pytest tests/test_source.py -v
@@ -350,7 +350,7 @@ pytest tests/test_source.py -v
 
 Expected: FAIL because `ipcodex.source` does not exist.
 
-- [ ] **Step 3: Implement immutable source models and preprocessing**
+- [x] **Step 3: Implement immutable source models and preprocessing**
 
 Create `src/ipcodex/source.py`:
 
@@ -415,7 +415,7 @@ def load_config(path: Path) -> SourceDocument:
     return preprocess_text(text, source_name=path.name)
 ```
 
-- [ ] **Step 4: Run the focused tests**
+- [x] **Step 4: Run the focused tests**
 
 ```bash
 pytest tests/test_source.py -v
@@ -423,7 +423,7 @@ pytest tests/test_source.py -v
 
 Expected: `3 passed`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/ipcodex/source.py tests/test_source.py
@@ -447,7 +447,7 @@ git commit -m "feat: preserve and normalize vrp source lines"
 - Schema patterns are anchored regular expressions with named capture groups.
 - `ViewSpec.allowed_parents` controls hierarchy; indentation alone never authorizes a parent-child relationship.
 
-- [ ] **Step 1: Write the failing schema loader test**
+- [x] **Step 1: Write the failing schema loader test**
 
 Create `tests/schema/test_loader.py`:
 
@@ -469,7 +469,7 @@ def test_load_huawei_vrp_schema_bundle() -> None:
     assert bundle.commands["interface_ip_address"].views == ("interface",)
 ```
 
-- [ ] **Step 2: Run the test and verify failure**
+- [x] **Step 2: Run the test and verify failure**
 
 ```bash
 pytest tests/schema/test_loader.py -v
@@ -477,7 +477,7 @@ pytest tests/schema/test_loader.py -v
 
 Expected: FAIL because schema models and files do not exist.
 
-- [ ] **Step 3: Implement schema models**
+- [x] **Step 3: Implement schema models**
 
 Create `src/ipcodex/schema/models.py`:
 
@@ -524,7 +524,7 @@ class SchemaBundle(BaseModel):
     commands: dict[str, CommandSpec] = Field(default_factory=dict)
 ```
 
-- [ ] **Step 4: Create the initial view schema**
+- [x] **Step 4: Create the initial view schema**
 
 Create `src/ipcodex/schema/huawei_vrp/views.yaml`:
 
@@ -553,7 +553,7 @@ views:
     closes_on_hash: true
 ```
 
-- [ ] **Step 5: Create the initial command schema**
+- [x] **Step 5: Create the initial command schema**
 
 Create `src/ipcodex/schema/huawei_vrp/commands.yaml`:
 
@@ -652,7 +652,7 @@ commands:
     parameters: []
 ```
 
-- [ ] **Step 6: Implement the YAML loader**
+- [x] **Step 6: Implement the YAML loader**
 
 Create `src/ipcodex/schema/loader.py`:
 
@@ -703,7 +703,7 @@ Create empty package markers:
 # src/ipcodex/schema/__init__.py
 ```
 
-- [ ] **Step 7: Run the schema test**
+- [x] **Step 7: Run the schema test**
 
 ```bash
 pytest tests/schema/test_loader.py -v
@@ -711,7 +711,7 @@ pytest tests/schema/test_loader.py -v
 
 Expected: `1 passed`.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add src/ipcodex/schema tests/schema/test_loader.py
@@ -734,7 +734,7 @@ git commit -m "feat: add versioned huawei vrp command schemas"
 - A view node stores its opening line, child nodes, and optional closing separator line.
 - All source line numbers must appear in `ConfigTree.mapped_line_numbers`.
 
-- [ ] **Step 1: Write failing hierarchy tests**
+- [x] **Step 1: Write failing hierarchy tests**
 
 Create `tests/cst/test_parser.py`:
 
@@ -790,7 +790,7 @@ def test_parser_preserves_unknown_commands_in_current_view() -> None:
     assert tree.mapped_line_numbers == (1, 2, 3)
 ```
 
-- [ ] **Step 2: Run tests and verify failure**
+- [x] **Step 2: Run tests and verify failure**
 
 ```bash
 pytest tests/cst/test_parser.py -v
@@ -798,7 +798,7 @@ pytest tests/cst/test_parser.py -v
 
 Expected: FAIL because CST modules do not exist.
 
-- [ ] **Step 3: Implement CST models**
+- [x] **Step 3: Implement CST models**
 
 Create `src/ipcodex/cst/models.py`:
 
@@ -842,7 +842,7 @@ class ConfigTree(BaseModel):
     warnings: tuple[str, ...] = ()
 ```
 
-- [ ] **Step 4: Implement schema-aware stack parsing**
+- [x] **Step 4: Implement schema-aware stack parsing**
 
 Create `src/ipcodex/cst/parser.py`:
 
@@ -980,7 +980,7 @@ Create package marker:
 # src/ipcodex/cst/__init__.py
 ```
 
-- [ ] **Step 5: Run the CST tests**
+- [x] **Step 5: Run the CST tests**
 
 ```bash
 pytest tests/cst/test_parser.py -v
@@ -988,7 +988,7 @@ pytest tests/cst/test_parser.py -v
 
 Expected: `2 passed`.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/ipcodex/cst tests/cst/test_parser.py
@@ -1010,7 +1010,7 @@ git commit -m "feat: build lossless vrp configuration tree"
 - Produces `CommandMatch` and `match_command`.
 - A command can match only when its parent view is listed in `CommandSpec.views`.
 
-- [ ] **Step 1: Write failing parameter tests**
+- [x] **Step 1: Write failing parameter tests**
 
 Create `tests/schema/test_types.py`:
 
@@ -1082,7 +1082,7 @@ def test_same_text_does_not_match_in_wrong_view() -> None:
     assert match_command(node, _schema()) is None
 ```
 
-- [ ] **Step 2: Run tests and verify failure**
+- [x] **Step 2: Run tests and verify failure**
 
 ```bash
 pytest tests/schema/test_types.py tests/schema/test_matcher.py -v
@@ -1090,7 +1090,7 @@ pytest tests/schema/test_types.py tests/schema/test_matcher.py -v
 
 Expected: FAIL because matcher and type decoder do not exist.
 
-- [ ] **Step 3: Implement typed parameter decoding**
+- [x] **Step 3: Implement typed parameter decoding**
 
 Create `src/ipcodex/schema/types.py`:
 
@@ -1152,7 +1152,7 @@ def decode_parameter(type_name: str, value: str | None) -> Any:
     raise ValueError(f"Unsupported parameter type: {type_name}")
 ```
 
-- [ ] **Step 4: Implement command matching**
+- [x] **Step 4: Implement command matching**
 
 Create `src/ipcodex/schema/matcher.py`:
 
@@ -1201,7 +1201,7 @@ def match_command(node: ConfigNode, schema: SchemaBundle) -> CommandMatch | None
     return None
 ```
 
-- [ ] **Step 5: Run the tests**
+- [x] **Step 5: Run the tests**
 
 ```bash
 pytest tests/schema/test_types.py tests/schema/test_matcher.py -v
@@ -1209,7 +1209,7 @@ pytest tests/schema/test_types.py tests/schema/test_matcher.py -v
 
 Expected: `5 passed`.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/ipcodex/schema tests/schema
@@ -1233,7 +1233,7 @@ git commit -m "feat: match vrp commands and decode parameters"
 - Interface view capture `interface_name` creates exactly one `InterfaceConfig`.
 - Explicit source precedence is last-command-wins within one configuration snapshot, while retaining all evidence records.
 
-- [ ] **Step 1: Write failing semantic tests**
+- [x] **Step 1: Write failing semantic tests**
 
 Create `tests/semantic/test_system.py`:
 
@@ -1295,7 +1295,7 @@ def test_interface_commands_build_typed_state() -> None:
     assert str(interface.ipv4_addresses[0].interface) == "10.0.0.1/30"
 ```
 
-- [ ] **Step 2: Run tests and verify failure**
+- [x] **Step 2: Run tests and verify failure**
 
 ```bash
 pytest tests/semantic/test_system.py tests/semantic/test_interface.py -v
@@ -1303,7 +1303,7 @@ pytest tests/semantic/test_system.py tests/semantic/test_interface.py -v
 
 Expected: FAIL because semantic models do not exist.
 
-- [ ] **Step 3: Implement evidence-aware semantic models**
+- [x] **Step 3: Implement evidence-aware semantic models**
 
 Create `src/ipcodex/semantic/models.py`:
 
@@ -1399,7 +1399,7 @@ class DeviceConfig(BaseModel):
     coverage: CoverageMetrics = Field(default_factory=CoverageMetrics)
 ```
 
-- [ ] **Step 4: Implement explicit-value updates and sysname**
+- [x] **Step 4: Implement explicit-value updates and sysname**
 
 Create `src/ipcodex/semantic/system.py`:
 
@@ -1449,7 +1449,7 @@ def apply_sysname(
     )
 ```
 
-- [ ] **Step 5: Implement interface semantics**
+- [x] **Step 5: Implement interface semantics**
 
 Create `src/ipcodex/semantic/interface.py`:
 
@@ -1522,7 +1522,7 @@ Create package marker:
 # src/ipcodex/semantic/__init__.py
 ```
 
-- [ ] **Step 6: Run the semantic tests**
+- [x] **Step 6: Run the semantic tests**
 
 ```bash
 pytest tests/semantic/test_system.py tests/semantic/test_interface.py -v
@@ -1530,7 +1530,7 @@ pytest tests/semantic/test_system.py tests/semantic/test_interface.py -v
 
 Expected: `2 passed`.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/ipcodex/semantic tests/semantic
@@ -1550,7 +1550,7 @@ git commit -m "feat: model device and interface configuration semantics"
 - VLAN output is sorted and deduplicated.
 - RD/RT values remain strings because Huawei accepts multiple textual formats.
 
-- [ ] **Step 1: Write failing network semantic tests**
+- [x] **Step 1: Write failing network semantic tests**
 
 Create `tests/semantic/test_network.py`:
 
@@ -1624,7 +1624,7 @@ def test_static_route_normalizes_prefix() -> None:
     assert device.static_routes[0].next_hop == "10.0.0.2"
 ```
 
-- [ ] **Step 2: Run tests and verify failure**
+- [x] **Step 2: Run tests and verify failure**
 
 ```bash
 pytest tests/semantic/test_network.py -v
@@ -1632,7 +1632,7 @@ pytest tests/semantic/test_network.py -v
 
 Expected: FAIL because `semantic.network` does not exist.
 
-- [ ] **Step 3: Implement network semantics**
+- [x] **Step 3: Implement network semantics**
 
 Create `src/ipcodex/semantic/network.py`:
 
@@ -1739,7 +1739,7 @@ def apply_static_route(
     )
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 ```bash
 pytest tests/semantic/test_network.py -v
@@ -1747,7 +1747,7 @@ pytest tests/semantic/test_network.py -v
 
 Expected: `3 passed`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/ipcodex/semantic/network.py tests/semantic/test_network.py
@@ -1768,7 +1768,7 @@ git commit -m "feat: parse vlan vrf and static route semantics"
 - Produces `DeviceConfig` and populates unknown items and unresolved references.
 - A configuration line with a valid structure but no matching `CommandSpec` counts as structurally mapped and semantically unknown.
 
-- [ ] **Step 1: Create the primary golden sample**
+- [x] **Step 1: Create the primary golden sample**
 
 Create `samples/huawei/ce_leaf_minimal.cfg`:
 
@@ -1805,7 +1805,7 @@ return
 
 The two trunk commands are intentionally outside the semantic MVP and must appear as unknown commands without causing failure.
 
-- [ ] **Step 2: Write the failing end-to-end semantic test**
+- [x] **Step 2: Write the failing end-to-end semantic test**
 
 Create `tests/test_pipeline.py`:
 
@@ -1843,7 +1843,7 @@ def test_build_semantic_model_from_huawei_configuration() -> None:
     assert device.coverage.semantic_coverage >= 0.85
 ```
 
-- [ ] **Step 3: Run the test and verify failure**
+- [x] **Step 3: Run the test and verify failure**
 
 ```bash
 pytest tests/test_pipeline.py -v
@@ -1851,7 +1851,7 @@ pytest tests/test_pipeline.py -v
 
 Expected: FAIL because semantic registry traversal does not exist.
 
-- [ ] **Step 4: Implement semantic traversal and dispatch**
+- [x] **Step 4: Implement semantic traversal and dispatch**
 
 Create `src/ipcodex/semantic/registry.py`:
 
@@ -1982,7 +1982,7 @@ def build_semantic_model(
     return device
 ```
 
-- [ ] **Step 5: Run the integration test**
+- [x] **Step 5: Run the integration test**
 
 ```bash
 pytest tests/test_pipeline.py -v
@@ -1990,7 +1990,7 @@ pytest tests/test_pipeline.py -v
 
 Expected: `1 passed`.
 
-- [ ] **Step 6: Add a missing-VRF reference test**
+- [x] **Step 6: Add a missing-VRF reference test**
 
 Append to `tests/test_pipeline.py`:
 
@@ -2015,7 +2015,7 @@ def test_missing_vpn_instance_is_reported_as_unresolved_reference() -> None:
     ]
 ```
 
-- [ ] **Step 7: Run all pipeline tests**
+- [x] **Step 7: Run all pipeline tests**
 
 ```bash
 pytest tests/test_pipeline.py -v
@@ -2023,7 +2023,7 @@ pytest tests/test_pipeline.py -v
 
 Expected: `2 passed`.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add src/ipcodex/semantic/registry.py samples tests/test_pipeline.py
@@ -2044,7 +2044,7 @@ git commit -m "feat: build semantic model and resolve configuration references"
 - CLI command: `ipcodex parse INPUT --output OUTPUT [--schema-root PATH]`.
 - JSON must be UTF-8, sorted by key, indented by two spaces, and end with a newline.
 
-- [ ] **Step 1: Write the failing CLI test**
+- [x] **Step 1: Write the failing CLI test**
 
 Create `tests/test_cli.py`:
 
@@ -2074,7 +2074,7 @@ def test_cli_parses_file_and_writes_deterministic_json(tmp_path: Path) -> None:
     assert output.read_text(encoding="utf-8").endswith("\n")
 ```
 
-- [ ] **Step 2: Run the test and verify failure**
+- [x] **Step 2: Run the test and verify failure**
 
 ```bash
 pytest tests/test_cli.py -v
@@ -2082,7 +2082,7 @@ pytest tests/test_cli.py -v
 
 Expected: FAIL because the public pipeline and CLI are not implemented.
 
-- [ ] **Step 3: Implement the public pipeline**
+- [x] **Step 3: Implement the public pipeline**
 
 Create `src/ipcodex/pipeline.py`:
 
@@ -2129,7 +2129,7 @@ def parse_file(
     )
 ```
 
-- [ ] **Step 4: Implement the CLI**
+- [x] **Step 4: Implement the CLI**
 
 Replace `src/ipcodex/cli.py`:
 
@@ -2171,7 +2171,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     raise AssertionError(f"Unhandled command: {args.command}")
 ```
 
-- [ ] **Step 5: Run the CLI test**
+- [x] **Step 5: Run the CLI test**
 
 ```bash
 pytest tests/test_cli.py -v
@@ -2179,7 +2179,7 @@ pytest tests/test_cli.py -v
 
 Expected: `1 passed`.
 
-- [ ] **Step 6: Run the CLI manually**
+- [x] **Step 6: Run the CLI manually**
 
 ```bash
 ipcodex parse samples/huawei/ce_leaf_minimal.cfg --output build/leaf01.json
@@ -2192,7 +2192,7 @@ Expected:
 - `device.hostname.value` is `Leaf01`.
 - `device.unknown_items` contains the two unsupported trunk commands.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/ipcodex/pipeline.py src/ipcodex/cli.py tests/test_cli.py
@@ -2214,7 +2214,7 @@ git commit -m "feat: expose vrp parser through deterministic json cli"
 - Golden JSON files define the contract for stable parser output.
 - Regression tests compare canonical JSON rather than Pydantic object identity.
 
-- [ ] **Step 1: Create an unknown-command resilience fixture**
+- [x] **Step 1: Create an unknown-command resilience fixture**
 
 Create `samples/huawei/ce_unknown_commands.cfg`:
 
@@ -2232,7 +2232,7 @@ experimental top-level command
 return
 ```
 
-- [ ] **Step 2: Generate golden outputs using the implemented CLI**
+- [x] **Step 2: Generate golden outputs using the implemented CLI**
 
 Run:
 
@@ -2243,11 +2243,11 @@ ipcodex parse samples/huawei/ce_unknown_commands.cfg --output tests/fixtures/ce_
 
 Expected: both JSON files are created and contain `schema_version = "0.1.0"`.
 
-- [ ] **Step 3: Review and normalize volatile fields**
+- [x] **Step 3: Review and normalize volatile fields**
 
 The MVP output must not include timestamps, absolute input paths, UUIDs, random identifiers, or environment-specific values. If any appear, remove them from the implementation before accepting the golden files.
 
-- [ ] **Step 4: Add golden regression tests**
+- [x] **Step 4: Add golden regression tests**
 
 Append to `tests/test_pipeline.py`:
 
@@ -2286,7 +2286,7 @@ Add these imports at the top of the file:
 import pytest
 ```
 
-- [ ] **Step 5: Add structural line-coverage assertion**
+- [x] **Step 5: Add structural line-coverage assertion**
 
 Append to `tests/test_pipeline.py`:
 
@@ -2303,7 +2303,7 @@ def test_every_source_line_is_mapped_in_cst() -> None:
     assert result.device.coverage.structural_coverage == 1.0
 ```
 
-- [ ] **Step 6: Run all tests with coverage**
+- [x] **Step 6: Run all tests with coverage**
 
 ```bash
 pytest -q --cov=ipcodex --cov-report=term-missing
@@ -2315,7 +2315,7 @@ Expected:
 - No missing lines in core source/schema/CST modules that reduce their combined coverage below 90%.
 - The primary sample semantic coverage is at least 85%.
 
-- [ ] **Step 7: Document usage and schema-extension workflow**
+- [x] **Step 7: Document usage and schema-extension workflow**
 
 Append to `README.md`:
 
@@ -2354,7 +2354,7 @@ The output contains:
    context.
 ````
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add README.md samples tests
