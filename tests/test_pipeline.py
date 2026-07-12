@@ -1,7 +1,11 @@
+import json
 from importlib.resources import files
 from pathlib import Path
 
+import pytest
+
 from ipcodex.cst.parser import parse_cst
+from ipcodex.pipeline import parse_file
 from ipcodex.schema.loader import load_schema_bundle
 from ipcodex.semantic.registry import build_semantic_model
 from ipcodex.source import load_config, preprocess_text
@@ -46,3 +50,38 @@ def test_missing_vpn_instance_is_reported_as_unresolved_reference() -> None:
     assert device.unresolved_references == [
         "interface:Vbdif100->vpn_instance:MISSING"
     ]
+
+
+@pytest.mark.parametrize(
+    ("config_path", "expected_path"),
+    [
+        (
+            Path("samples/huawei/ce_leaf_minimal.cfg"),
+            Path("tests/fixtures/ce_leaf_minimal.expected.json"),
+        ),
+        (
+            Path("samples/huawei/ce_unknown_commands.cfg"),
+            Path("tests/fixtures/ce_unknown_commands.expected.json"),
+        ),
+    ],
+)
+def test_parser_matches_golden_json(
+    config_path: Path,
+    expected_path: Path,
+) -> None:
+    actual = parse_file(config_path).model_dump(mode="json")
+    expected = json.loads(expected_path.read_text(encoding="utf-8"))
+
+    assert actual == expected
+
+
+def test_every_source_line_is_mapped_in_cst() -> None:
+    result = parse_file(Path("samples/huawei/ce_leaf_minimal.cfg"))
+    input_line_count = len(
+        Path("samples/huawei/ce_leaf_minimal.cfg")
+        .read_text(encoding="utf-8")
+        .splitlines()
+    )
+
+    assert result.tree.mapped_line_numbers == tuple(range(1, input_line_count + 1))
+    assert result.device.coverage.structural_coverage == 1.0

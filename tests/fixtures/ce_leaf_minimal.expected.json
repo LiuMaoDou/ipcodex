@@ -1,0 +1,751 @@
+{
+  "device": {
+    "coverage": {
+      "command_lines": 15,
+      "semantic_coverage": 0.8666666666666667,
+      "semantically_recognized_lines": 13,
+      "structural_coverage": 1.0,
+      "structurally_mapped_lines": 28,
+      "total_non_blank_lines": 28
+    },
+    "hostname": {
+      "evidence": [
+        {
+          "command_id": "system_sysname",
+          "line_number": 1,
+          "raw_text": "sysname Leaf01"
+        }
+      ],
+      "source": "explicit",
+      "value": "Leaf01"
+    },
+    "interfaces": {
+      "100GE1/0/1": {
+        "admin_enabled": {
+          "evidence": [],
+          "source": "unknown",
+          "value": null
+        },
+        "creation_evidence": {
+          "command_id": null,
+          "line_number": 10,
+          "raw_text": "interface 100GE1/0/1"
+        },
+        "description": {
+          "evidence": [
+            {
+              "command_id": "interface_description",
+              "line_number": 11,
+              "raw_text": " description TO-SPINE01"
+            }
+          ],
+          "source": "explicit",
+          "value": "TO-SPINE01"
+        },
+        "eth_trunk_id": {
+          "evidence": [],
+          "source": "unknown",
+          "value": null
+        },
+        "ipv4_addresses": [
+          {
+            "evidence": {
+              "command_id": "interface_ip_address",
+              "line_number": 13,
+              "raw_text": " ip address 10.0.0.1 255.255.255.252"
+            },
+            "interface": "10.0.0.1/30",
+            "is_sub": false
+          }
+        ],
+        "layer_mode": {
+          "evidence": [
+            {
+              "command_id": "interface_undo_portswitch",
+              "line_number": 12,
+              "raw_text": " undo portswitch"
+            }
+          ],
+          "source": "explicit",
+          "value": "layer3"
+        },
+        "name": "100GE1/0/1",
+        "vrf_name": {
+          "evidence": [],
+          "source": "unknown",
+          "value": null
+        }
+      },
+      "Eth-Trunk10": {
+        "admin_enabled": {
+          "evidence": [],
+          "source": "unknown",
+          "value": null
+        },
+        "creation_evidence": {
+          "command_id": null,
+          "line_number": 5,
+          "raw_text": "interface Eth-Trunk10"
+        },
+        "description": {
+          "evidence": [
+            {
+              "command_id": "interface_description",
+              "line_number": 6,
+              "raw_text": " description TO-SERVER-A"
+            }
+          ],
+          "source": "explicit",
+          "value": "TO-SERVER-A"
+        },
+        "eth_trunk_id": {
+          "evidence": [],
+          "source": "unknown",
+          "value": null
+        },
+        "ipv4_addresses": [],
+        "layer_mode": {
+          "evidence": [],
+          "source": "unknown",
+          "value": null
+        },
+        "name": "Eth-Trunk10",
+        "vrf_name": {
+          "evidence": [],
+          "source": "unknown",
+          "value": null
+        }
+      },
+      "Vbdif100": {
+        "admin_enabled": {
+          "evidence": [],
+          "source": "unknown",
+          "value": null
+        },
+        "creation_evidence": {
+          "command_id": null,
+          "line_number": 15,
+          "raw_text": "interface Vbdif100"
+        },
+        "description": {
+          "evidence": [],
+          "source": "unknown",
+          "value": null
+        },
+        "eth_trunk_id": {
+          "evidence": [],
+          "source": "unknown",
+          "value": null
+        },
+        "ipv4_addresses": [
+          {
+            "evidence": {
+              "command_id": "interface_ip_address",
+              "line_number": 17,
+              "raw_text": " ip address 192.168.100.1 255.255.255.0"
+            },
+            "interface": "192.168.100.1/24",
+            "is_sub": false
+          }
+        ],
+        "layer_mode": {
+          "evidence": [],
+          "source": "unknown",
+          "value": null
+        },
+        "name": "Vbdif100",
+        "vrf_name": {
+          "evidence": [
+            {
+              "command_id": "interface_bind_vrf",
+              "line_number": 16,
+              "raw_text": " ip binding vpn-instance VPN-A"
+            }
+          ],
+          "source": "explicit",
+          "value": "VPN-A"
+        }
+      }
+    },
+    "os": "vrp",
+    "source_name": "ce_leaf_minimal.cfg",
+    "static_routes": [
+      {
+        "evidence": {
+          "command_id": "static_route_ipv4",
+          "line_number": 26,
+          "raw_text": "ip route-static 0.0.0.0 0.0.0.0 10.0.0.2"
+        },
+        "next_hop": "10.0.0.2",
+        "preference": null,
+        "prefix": "0.0.0.0/0"
+      }
+    ],
+    "unknown_items": [
+      {
+        "current_view": "interface",
+        "line_number": 7,
+        "raw_text": " port link-type trunk",
+        "reason": "no_command_schema_match"
+      },
+      {
+        "current_view": "interface",
+        "line_number": 8,
+        "raw_text": " port trunk allow-pass vlan 100",
+        "reason": "no_command_schema_match"
+      }
+    ],
+    "unresolved_references": [],
+    "vendor": "huawei",
+    "vlans": [
+      100,
+      200,
+      201,
+      202
+    ],
+    "vpn_instances": {
+      "VPN-A": {
+        "creation_evidence": {
+          "command_id": null,
+          "line_number": 19,
+          "raw_text": "ip vpn-instance VPN-A"
+        },
+        "evidence": [
+          {
+            "command_id": "network_vpn_rd",
+            "line_number": 21,
+            "raw_text": "  route-distinguisher 65001:100"
+          },
+          {
+            "command_id": "network_vpn_target",
+            "line_number": 22,
+            "raw_text": "  vpn-target 65000:100 export-extcommunity"
+          },
+          {
+            "command_id": "network_vpn_target",
+            "line_number": 23,
+            "raw_text": "  vpn-target 65000:100 import-extcommunity"
+          }
+        ],
+        "export_route_targets": [
+          "65000:100"
+        ],
+        "import_route_targets": [
+          "65000:100"
+        ],
+        "name": "VPN-A",
+        "route_distinguisher": {
+          "evidence": [
+            {
+              "command_id": "vpn_rd",
+              "line_number": 21,
+              "raw_text": "  route-distinguisher 65001:100"
+            }
+          ],
+          "source": "explicit",
+          "value": "65001:100"
+        }
+      }
+    },
+    "warnings": []
+  },
+  "schema_version": "0.1.0",
+  "tree": {
+    "mapped_line_numbers": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28
+    ],
+    "root": {
+      "captures": {},
+      "children": [
+        {
+          "captures": {},
+          "children": [],
+          "closing_line_number": null,
+          "indentation": 0,
+          "kind": "command",
+          "line_number": 1,
+          "parent_view_id": "system",
+          "raw_text": "sysname Leaf01",
+          "text": "sysname Leaf01",
+          "view_id": null
+        },
+        {
+          "captures": {},
+          "children": [],
+          "closing_line_number": null,
+          "indentation": 0,
+          "kind": "command",
+          "line_number": 3,
+          "parent_view_id": "system",
+          "raw_text": "vlan batch 100 200 to 202",
+          "text": "vlan batch 100 200 to 202",
+          "view_id": null
+        },
+        {
+          "captures": {
+            "interface_name": "Eth-Trunk10"
+          },
+          "children": [
+            {
+              "captures": {},
+              "children": [],
+              "closing_line_number": null,
+              "indentation": 1,
+              "kind": "command",
+              "line_number": 6,
+              "parent_view_id": "interface",
+              "raw_text": " description TO-SERVER-A",
+              "text": "description TO-SERVER-A",
+              "view_id": null
+            },
+            {
+              "captures": {},
+              "children": [],
+              "closing_line_number": null,
+              "indentation": 1,
+              "kind": "command",
+              "line_number": 7,
+              "parent_view_id": "interface",
+              "raw_text": " port link-type trunk",
+              "text": "port link-type trunk",
+              "view_id": null
+            },
+            {
+              "captures": {},
+              "children": [],
+              "closing_line_number": null,
+              "indentation": 1,
+              "kind": "command",
+              "line_number": 8,
+              "parent_view_id": "interface",
+              "raw_text": " port trunk allow-pass vlan 100",
+              "text": "port trunk allow-pass vlan 100",
+              "view_id": null
+            }
+          ],
+          "closing_line_number": 9,
+          "indentation": 0,
+          "kind": "view",
+          "line_number": 5,
+          "parent_view_id": "system",
+          "raw_text": "interface Eth-Trunk10",
+          "text": "interface Eth-Trunk10",
+          "view_id": "interface"
+        },
+        {
+          "captures": {
+            "interface_name": "100GE1/0/1"
+          },
+          "children": [
+            {
+              "captures": {},
+              "children": [],
+              "closing_line_number": null,
+              "indentation": 1,
+              "kind": "command",
+              "line_number": 11,
+              "parent_view_id": "interface",
+              "raw_text": " description TO-SPINE01",
+              "text": "description TO-SPINE01",
+              "view_id": null
+            },
+            {
+              "captures": {},
+              "children": [],
+              "closing_line_number": null,
+              "indentation": 1,
+              "kind": "command",
+              "line_number": 12,
+              "parent_view_id": "interface",
+              "raw_text": " undo portswitch",
+              "text": "undo portswitch",
+              "view_id": null
+            },
+            {
+              "captures": {},
+              "children": [],
+              "closing_line_number": null,
+              "indentation": 1,
+              "kind": "command",
+              "line_number": 13,
+              "parent_view_id": "interface",
+              "raw_text": " ip address 10.0.0.1 255.255.255.252",
+              "text": "ip address 10.0.0.1 255.255.255.252",
+              "view_id": null
+            }
+          ],
+          "closing_line_number": 14,
+          "indentation": 0,
+          "kind": "view",
+          "line_number": 10,
+          "parent_view_id": "system",
+          "raw_text": "interface 100GE1/0/1",
+          "text": "interface 100GE1/0/1",
+          "view_id": "interface"
+        },
+        {
+          "captures": {
+            "interface_name": "Vbdif100"
+          },
+          "children": [
+            {
+              "captures": {},
+              "children": [],
+              "closing_line_number": null,
+              "indentation": 1,
+              "kind": "command",
+              "line_number": 16,
+              "parent_view_id": "interface",
+              "raw_text": " ip binding vpn-instance VPN-A",
+              "text": "ip binding vpn-instance VPN-A",
+              "view_id": null
+            },
+            {
+              "captures": {},
+              "children": [],
+              "closing_line_number": null,
+              "indentation": 1,
+              "kind": "command",
+              "line_number": 17,
+              "parent_view_id": "interface",
+              "raw_text": " ip address 192.168.100.1 255.255.255.0",
+              "text": "ip address 192.168.100.1 255.255.255.0",
+              "view_id": null
+            }
+          ],
+          "closing_line_number": 18,
+          "indentation": 0,
+          "kind": "view",
+          "line_number": 15,
+          "parent_view_id": "system",
+          "raw_text": "interface Vbdif100",
+          "text": "interface Vbdif100",
+          "view_id": "interface"
+        },
+        {
+          "captures": {
+            "vrf_name": "VPN-A"
+          },
+          "children": [
+            {
+              "captures": {},
+              "children": [
+                {
+                  "captures": {},
+                  "children": [],
+                  "closing_line_number": null,
+                  "indentation": 2,
+                  "kind": "command",
+                  "line_number": 21,
+                  "parent_view_id": "vpn_ipv4_family",
+                  "raw_text": "  route-distinguisher 65001:100",
+                  "text": "route-distinguisher 65001:100",
+                  "view_id": null
+                },
+                {
+                  "captures": {},
+                  "children": [],
+                  "closing_line_number": null,
+                  "indentation": 2,
+                  "kind": "command",
+                  "line_number": 22,
+                  "parent_view_id": "vpn_ipv4_family",
+                  "raw_text": "  vpn-target 65000:100 export-extcommunity",
+                  "text": "vpn-target 65000:100 export-extcommunity",
+                  "view_id": null
+                },
+                {
+                  "captures": {},
+                  "children": [],
+                  "closing_line_number": null,
+                  "indentation": 2,
+                  "kind": "command",
+                  "line_number": 23,
+                  "parent_view_id": "vpn_ipv4_family",
+                  "raw_text": "  vpn-target 65000:100 import-extcommunity",
+                  "text": "vpn-target 65000:100 import-extcommunity",
+                  "view_id": null
+                }
+              ],
+              "closing_line_number": 24,
+              "indentation": 1,
+              "kind": "view",
+              "line_number": 20,
+              "parent_view_id": "vpn_instance",
+              "raw_text": " ipv4-family",
+              "text": "ipv4-family",
+              "view_id": "vpn_ipv4_family"
+            }
+          ],
+          "closing_line_number": 25,
+          "indentation": 0,
+          "kind": "view",
+          "line_number": 19,
+          "parent_view_id": "system",
+          "raw_text": "ip vpn-instance VPN-A",
+          "text": "ip vpn-instance VPN-A",
+          "view_id": "vpn_instance"
+        },
+        {
+          "captures": {},
+          "children": [],
+          "closing_line_number": null,
+          "indentation": 0,
+          "kind": "command",
+          "line_number": 26,
+          "parent_view_id": "system",
+          "raw_text": "ip route-static 0.0.0.0 0.0.0.0 10.0.0.2",
+          "text": "ip route-static 0.0.0.0 0.0.0.0 10.0.0.2",
+          "view_id": null
+        },
+        {
+          "captures": {},
+          "children": [],
+          "closing_line_number": null,
+          "indentation": 0,
+          "kind": "command",
+          "line_number": 28,
+          "parent_view_id": "system",
+          "raw_text": "return",
+          "text": "return",
+          "view_id": null
+        }
+      ],
+      "closing_line_number": null,
+      "indentation": -1,
+      "kind": "root",
+      "line_number": null,
+      "parent_view_id": null,
+      "raw_text": "",
+      "text": "system",
+      "view_id": "system"
+    },
+    "source_lines": [
+      {
+        "indentation": 0,
+        "is_blank": false,
+        "line_number": 1,
+        "normalized_text": "sysname Leaf01",
+        "raw_text": "sysname Leaf01"
+      },
+      {
+        "indentation": 0,
+        "is_blank": false,
+        "line_number": 2,
+        "normalized_text": "#",
+        "raw_text": "#"
+      },
+      {
+        "indentation": 0,
+        "is_blank": false,
+        "line_number": 3,
+        "normalized_text": "vlan batch 100 200 to 202",
+        "raw_text": "vlan batch 100 200 to 202"
+      },
+      {
+        "indentation": 0,
+        "is_blank": false,
+        "line_number": 4,
+        "normalized_text": "#",
+        "raw_text": "#"
+      },
+      {
+        "indentation": 0,
+        "is_blank": false,
+        "line_number": 5,
+        "normalized_text": "interface Eth-Trunk10",
+        "raw_text": "interface Eth-Trunk10"
+      },
+      {
+        "indentation": 1,
+        "is_blank": false,
+        "line_number": 6,
+        "normalized_text": " description TO-SERVER-A",
+        "raw_text": " description TO-SERVER-A"
+      },
+      {
+        "indentation": 1,
+        "is_blank": false,
+        "line_number": 7,
+        "normalized_text": " port link-type trunk",
+        "raw_text": " port link-type trunk"
+      },
+      {
+        "indentation": 1,
+        "is_blank": false,
+        "line_number": 8,
+        "normalized_text": " port trunk allow-pass vlan 100",
+        "raw_text": " port trunk allow-pass vlan 100"
+      },
+      {
+        "indentation": 0,
+        "is_blank": false,
+        "line_number": 9,
+        "normalized_text": "#",
+        "raw_text": "#"
+      },
+      {
+        "indentation": 0,
+        "is_blank": false,
+        "line_number": 10,
+        "normalized_text": "interface 100GE1/0/1",
+        "raw_text": "interface 100GE1/0/1"
+      },
+      {
+        "indentation": 1,
+        "is_blank": false,
+        "line_number": 11,
+        "normalized_text": " description TO-SPINE01",
+        "raw_text": " description TO-SPINE01"
+      },
+      {
+        "indentation": 1,
+        "is_blank": false,
+        "line_number": 12,
+        "normalized_text": " undo portswitch",
+        "raw_text": " undo portswitch"
+      },
+      {
+        "indentation": 1,
+        "is_blank": false,
+        "line_number": 13,
+        "normalized_text": " ip address 10.0.0.1 255.255.255.252",
+        "raw_text": " ip address 10.0.0.1 255.255.255.252"
+      },
+      {
+        "indentation": 0,
+        "is_blank": false,
+        "line_number": 14,
+        "normalized_text": "#",
+        "raw_text": "#"
+      },
+      {
+        "indentation": 0,
+        "is_blank": false,
+        "line_number": 15,
+        "normalized_text": "interface Vbdif100",
+        "raw_text": "interface Vbdif100"
+      },
+      {
+        "indentation": 1,
+        "is_blank": false,
+        "line_number": 16,
+        "normalized_text": " ip binding vpn-instance VPN-A",
+        "raw_text": " ip binding vpn-instance VPN-A"
+      },
+      {
+        "indentation": 1,
+        "is_blank": false,
+        "line_number": 17,
+        "normalized_text": " ip address 192.168.100.1 255.255.255.0",
+        "raw_text": " ip address 192.168.100.1 255.255.255.0"
+      },
+      {
+        "indentation": 0,
+        "is_blank": false,
+        "line_number": 18,
+        "normalized_text": "#",
+        "raw_text": "#"
+      },
+      {
+        "indentation": 0,
+        "is_blank": false,
+        "line_number": 19,
+        "normalized_text": "ip vpn-instance VPN-A",
+        "raw_text": "ip vpn-instance VPN-A"
+      },
+      {
+        "indentation": 1,
+        "is_blank": false,
+        "line_number": 20,
+        "normalized_text": " ipv4-family",
+        "raw_text": " ipv4-family"
+      },
+      {
+        "indentation": 2,
+        "is_blank": false,
+        "line_number": 21,
+        "normalized_text": "  route-distinguisher 65001:100",
+        "raw_text": "  route-distinguisher 65001:100"
+      },
+      {
+        "indentation": 2,
+        "is_blank": false,
+        "line_number": 22,
+        "normalized_text": "  vpn-target 65000:100 export-extcommunity",
+        "raw_text": "  vpn-target 65000:100 export-extcommunity"
+      },
+      {
+        "indentation": 2,
+        "is_blank": false,
+        "line_number": 23,
+        "normalized_text": "  vpn-target 65000:100 import-extcommunity",
+        "raw_text": "  vpn-target 65000:100 import-extcommunity"
+      },
+      {
+        "indentation": 1,
+        "is_blank": false,
+        "line_number": 24,
+        "normalized_text": " #",
+        "raw_text": " #"
+      },
+      {
+        "indentation": 0,
+        "is_blank": false,
+        "line_number": 25,
+        "normalized_text": "#",
+        "raw_text": "#"
+      },
+      {
+        "indentation": 0,
+        "is_blank": false,
+        "line_number": 26,
+        "normalized_text": "ip route-static 0.0.0.0 0.0.0.0 10.0.0.2",
+        "raw_text": "ip route-static 0.0.0.0 0.0.0.0 10.0.0.2"
+      },
+      {
+        "indentation": 0,
+        "is_blank": false,
+        "line_number": 27,
+        "normalized_text": "#",
+        "raw_text": "#"
+      },
+      {
+        "indentation": 0,
+        "is_blank": false,
+        "line_number": 28,
+        "normalized_text": "return",
+        "raw_text": "return"
+      }
+    ],
+    "source_name": "ce_leaf_minimal.cfg",
+    "warnings": []
+  }
+}

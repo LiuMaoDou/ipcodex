@@ -1,0 +1,312 @@
+{
+  "device": {
+    "coverage": {
+      "command_lines": 7,
+      "semantic_coverage": 0.7142857142857143,
+      "semantically_recognized_lines": 5,
+      "structural_coverage": 1.0,
+      "structurally_mapped_lines": 11,
+      "total_non_blank_lines": 11
+    },
+    "hostname": {
+      "evidence": [
+        {
+          "command_id": "system_sysname",
+          "line_number": 1,
+          "raw_text": "sysname Edge01"
+        }
+      ],
+      "source": "explicit",
+      "value": "Edge01"
+    },
+    "interfaces": {
+      "GigabitEthernet0/0/1": {
+        "admin_enabled": {
+          "evidence": [],
+          "source": "unknown",
+          "value": null
+        },
+        "creation_evidence": {
+          "command_id": null,
+          "line_number": 3,
+          "raw_text": "interface GigabitEthernet0/0/1"
+        },
+        "description": {
+          "evidence": [
+            {
+              "command_id": "interface_description",
+              "line_number": 4,
+              "raw_text": " description INTERNET"
+            }
+          ],
+          "source": "explicit",
+          "value": "INTERNET"
+        },
+        "eth_trunk_id": {
+          "evidence": [],
+          "source": "unknown",
+          "value": null
+        },
+        "ipv4_addresses": [
+          {
+            "evidence": {
+              "command_id": "interface_ip_address",
+              "line_number": 6,
+              "raw_text": " ip address 203.0.113.1 255.255.255.252"
+            },
+            "interface": "203.0.113.1/30",
+            "is_sub": false
+          }
+        ],
+        "layer_mode": {
+          "evidence": [
+            {
+              "command_id": "interface_undo_portswitch",
+              "line_number": 5,
+              "raw_text": " undo portswitch"
+            }
+          ],
+          "source": "explicit",
+          "value": "layer3"
+        },
+        "name": "GigabitEthernet0/0/1",
+        "vrf_name": {
+          "evidence": [],
+          "source": "unknown",
+          "value": null
+        }
+      }
+    },
+    "os": "vrp",
+    "source_name": "ce_unknown_commands.cfg",
+    "static_routes": [],
+    "unknown_items": [
+      {
+        "current_view": "interface",
+        "line_number": 7,
+        "raw_text": " proprietary-feature enable",
+        "reason": "no_command_schema_match"
+      },
+      {
+        "current_view": "system",
+        "line_number": 9,
+        "raw_text": "experimental top-level command",
+        "reason": "no_command_schema_match"
+      }
+    ],
+    "unresolved_references": [],
+    "vendor": "huawei",
+    "vlans": [],
+    "vpn_instances": {},
+    "warnings": []
+  },
+  "schema_version": "0.1.0",
+  "tree": {
+    "mapped_line_numbers": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "root": {
+      "captures": {},
+      "children": [
+        {
+          "captures": {},
+          "children": [],
+          "closing_line_number": null,
+          "indentation": 0,
+          "kind": "command",
+          "line_number": 1,
+          "parent_view_id": "system",
+          "raw_text": "sysname Edge01",
+          "text": "sysname Edge01",
+          "view_id": null
+        },
+        {
+          "captures": {
+            "interface_name": "GigabitEthernet0/0/1"
+          },
+          "children": [
+            {
+              "captures": {},
+              "children": [],
+              "closing_line_number": null,
+              "indentation": 1,
+              "kind": "command",
+              "line_number": 4,
+              "parent_view_id": "interface",
+              "raw_text": " description INTERNET",
+              "text": "description INTERNET",
+              "view_id": null
+            },
+            {
+              "captures": {},
+              "children": [],
+              "closing_line_number": null,
+              "indentation": 1,
+              "kind": "command",
+              "line_number": 5,
+              "parent_view_id": "interface",
+              "raw_text": " undo portswitch",
+              "text": "undo portswitch",
+              "view_id": null
+            },
+            {
+              "captures": {},
+              "children": [],
+              "closing_line_number": null,
+              "indentation": 1,
+              "kind": "command",
+              "line_number": 6,
+              "parent_view_id": "interface",
+              "raw_text": " ip address 203.0.113.1 255.255.255.252",
+              "text": "ip address 203.0.113.1 255.255.255.252",
+              "view_id": null
+            },
+            {
+              "captures": {},
+              "children": [],
+              "closing_line_number": null,
+              "indentation": 1,
+              "kind": "command",
+              "line_number": 7,
+              "parent_view_id": "interface",
+              "raw_text": " proprietary-feature enable",
+              "text": "proprietary-feature enable",
+              "view_id": null
+            }
+          ],
+          "closing_line_number": 8,
+          "indentation": 0,
+          "kind": "view",
+          "line_number": 3,
+          "parent_view_id": "system",
+          "raw_text": "interface GigabitEthernet0/0/1",
+          "text": "interface GigabitEthernet0/0/1",
+          "view_id": "interface"
+        },
+        {
+          "captures": {},
+          "children": [],
+          "closing_line_number": null,
+          "indentation": 0,
+          "kind": "command",
+          "line_number": 9,
+          "parent_view_id": "system",
+          "raw_text": "experimental top-level command",
+          "text": "experimental top-level command",
+          "view_id": null
+        },
+        {
+          "captures": {},
+          "children": [],
+          "closing_line_number": null,
+          "indentation": 0,
+          "kind": "command",
+          "line_number": 11,
+          "parent_view_id": "system",
+          "raw_text": "return",
+          "text": "return",
+          "view_id": null
+        }
+      ],
+      "closing_line_number": null,
+      "indentation": -1,
+      "kind": "root",
+      "line_number": null,
+      "parent_view_id": null,
+      "raw_text": "",
+      "text": "system",
+      "view_id": "system"
+    },
+    "source_lines": [
+      {
+        "indentation": 0,
+        "is_blank": false,
+        "line_number": 1,
+        "normalized_text": "sysname Edge01",
+        "raw_text": "sysname Edge01"
+      },
+      {
+        "indentation": 0,
+        "is_blank": false,
+        "line_number": 2,
+        "normalized_text": "#",
+        "raw_text": "#"
+      },
+      {
+        "indentation": 0,
+        "is_blank": false,
+        "line_number": 3,
+        "normalized_text": "interface GigabitEthernet0/0/1",
+        "raw_text": "interface GigabitEthernet0/0/1"
+      },
+      {
+        "indentation": 1,
+        "is_blank": false,
+        "line_number": 4,
+        "normalized_text": " description INTERNET",
+        "raw_text": " description INTERNET"
+      },
+      {
+        "indentation": 1,
+        "is_blank": false,
+        "line_number": 5,
+        "normalized_text": " undo portswitch",
+        "raw_text": " undo portswitch"
+      },
+      {
+        "indentation": 1,
+        "is_blank": false,
+        "line_number": 6,
+        "normalized_text": " ip address 203.0.113.1 255.255.255.252",
+        "raw_text": " ip address 203.0.113.1 255.255.255.252"
+      },
+      {
+        "indentation": 1,
+        "is_blank": false,
+        "line_number": 7,
+        "normalized_text": " proprietary-feature enable",
+        "raw_text": " proprietary-feature enable"
+      },
+      {
+        "indentation": 0,
+        "is_blank": false,
+        "line_number": 8,
+        "normalized_text": "#",
+        "raw_text": "#"
+      },
+      {
+        "indentation": 0,
+        "is_blank": false,
+        "line_number": 9,
+        "normalized_text": "experimental top-level command",
+        "raw_text": "experimental top-level command"
+      },
+      {
+        "indentation": 0,
+        "is_blank": false,
+        "line_number": 10,
+        "normalized_text": "#",
+        "raw_text": "#"
+      },
+      {
+        "indentation": 0,
+        "is_blank": false,
+        "line_number": 11,
+        "normalized_text": "return",
+        "raw_text": "return"
+      }
+    ],
+    "source_name": "ce_unknown_commands.cfg",
+    "warnings": []
+  }
+}
